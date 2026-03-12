@@ -1,0 +1,612 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		140E66CA28C57B18E2B279BD /* ModelDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63B79986F927C69603966A9 /* ModelDecodingTests.swift */; };
+		2D589772D5C869B68DEA1B6D /* ServerDiscoveryServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AFBA3AB104CA86C6F3FB1BD /* ServerDiscoveryServiceTests.swift */; };
+		2E520977399172EC1261594C /* RadioLibreApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB779333233F074F4AD4EAB /* RadioLibreApp.swift */; };
+		2EC3CD43539CEB35DD02F287 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29BF82FFA791BD2632B233EF /* AppError.swift */; };
+		3C9458A7F799B6F45AF9F9AE /* DiscoverViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2847C72127CDDC0DB8DE9A95 /* DiscoverViewModelTests.swift */; };
+		473F8EF5B16C230E725C5721 /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 498C8ED846A133D224EC72D0 /* Tag.swift */; };
+		4A7DA36E31F32541F10F3FD8 /* RadioBrowserServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2F53052C38132DAFC9745A /* RadioBrowserServiceTests.swift */; };
+		632FFBED715691AE269125CB /* LoadingViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 346BC269194DDF252A040AE7 /* LoadingViewTests.swift */; };
+		6449FC141671C3B9F6555A36 /* Country.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E89F266018FC79BD64C511D /* Country.swift */; };
+		72C9131E2CA834C047216FD8 /* ServerStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B48048AAE0967D28DCD5452 /* ServerStats.swift */; };
+		74E9EF39CC7DD109BBAF8122 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F8F03D30BFE7A611BBBCC7 /* Language.swift */; };
+		76DD3E814CEA4567B3F0BAE0 /* RadioBrowserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62E2077974D7A2297C57D775 /* RadioBrowserService.swift */; };
+		7A39F56AE5FBA5FB19867E72 /* StationDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC5C8200DDC0967BEFBBED67 /* StationDTO.swift */; };
+		7FB3230E599B73C01F0C2288 /* ServerDiscoveryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40FEAFDFCB51946252BE13C6 /* ServerDiscoveryService.swift */; };
+		82811EF06346BA7E60FFD244 /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21516389A7987634EC8D58B7 /* DiscoverView.swift */; };
+		A736E886FE50B967A4DE61BC /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058909C27A4677C163E35084 /* ErrorView.swift */; };
+		B08080EBA0EEFD8DFD2BF449 /* AppErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A752136A0810EDCAFFEA4B91 /* AppErrorTests.swift */; };
+		B1B965A60B53C8F097B107CB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 022DDD76BA5F5AA63185D913 /* Assets.xcassets */; };
+		B80C18203A75084DF6880926 /* StationRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45AC25015583C05268EF261B /* StationRowView.swift */; };
+		BC9AB3777A24950E57F10B93 /* ClickResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE6E23DEEA994593218C911D /* ClickResponse.swift */; };
+		D7D59E52991CAA3E17EB10CF /* VoteResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9380A23EA815CB9037FE4D94 /* VoteResponse.swift */; };
+		DB3EACA2405AD8CDB6CCFB95 /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5BA356A2871D1C395A7EF5 /* TestHelpers.swift */; };
+		DE7D7E284AC79788CA5B54E3 /* StationDTOTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E174624D0348300DD545D35 /* StationDTOTests.swift */; };
+		DF8CAB02F93D7B7A735E775D /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F66EA829D34D4EC1A0BC6994 /* RootTabView.swift */; };
+		DFA08517DD3BAA94525C250F /* DiscoverViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A52E0DC4228DE98AAFFCCC8B /* DiscoverViewModel.swift */; };
+		DFD4E4E0974651C80D9A5CA7 /* MockURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B88EA5A5597FFB07E673600 /* MockURLProtocol.swift */; };
+		E1F6B9AF026F406BBAD3EE7E /* ErrorViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3C59250AB9AA3DF70BFDA1 /* ErrorViewTests.swift */; };
+		F0A0FB742EB09B5D6FA19C0A /* DNSResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22027F1CAADDA962D657EE80 /* DNSResolver.swift */; };
+		F38645643D350108DD204B25 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1E6BFF9337B872EF703968 /* LoadingView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A79866D1E29A4B274F6183AF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DC2C8CD371698E8F283C037A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 382FF616E833AD032879D1E5;
+			remoteInfo = RadioLibre;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		022DDD76BA5F5AA63185D913 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		058909C27A4677C163E35084 /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
+		0BB779333233F074F4AD4EAB /* RadioLibreApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioLibreApp.swift; sourceTree = "<group>"; };
+		19C1E892D2B35329A72E7C3A /* RadioLibre.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = RadioLibre.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		21516389A7987634EC8D58B7 /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
+		22027F1CAADDA962D657EE80 /* DNSResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSResolver.swift; sourceTree = "<group>"; };
+		2847C72127CDDC0DB8DE9A95 /* DiscoverViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverViewModelTests.swift; sourceTree = "<group>"; };
+		29BF82FFA791BD2632B233EF /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
+		346BC269194DDF252A040AE7 /* LoadingViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingViewTests.swift; sourceTree = "<group>"; };
+		3E89F266018FC79BD64C511D /* Country.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Country.swift; sourceTree = "<group>"; };
+		40FEAFDFCB51946252BE13C6 /* ServerDiscoveryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerDiscoveryService.swift; sourceTree = "<group>"; };
+		45AC25015583C05268EF261B /* StationRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationRowView.swift; sourceTree = "<group>"; };
+		4726088C89EBA8730F05959D /* RadioLibreTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = RadioLibreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		498C8ED846A133D224EC72D0 /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
+		4AFBA3AB104CA86C6F3FB1BD /* ServerDiscoveryServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerDiscoveryServiceTests.swift; sourceTree = "<group>"; };
+		4B48048AAE0967D28DCD5452 /* ServerStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerStats.swift; sourceTree = "<group>"; };
+		4F3C59250AB9AA3DF70BFDA1 /* ErrorViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorViewTests.swift; sourceTree = "<group>"; };
+		62E2077974D7A2297C57D775 /* RadioBrowserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioBrowserService.swift; sourceTree = "<group>"; };
+		6E174624D0348300DD545D35 /* StationDTOTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationDTOTests.swift; sourceTree = "<group>"; };
+		7B88EA5A5597FFB07E673600 /* MockURLProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockURLProtocol.swift; sourceTree = "<group>"; };
+		8D1E6BFF9337B872EF703968 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
+		9380A23EA815CB9037FE4D94 /* VoteResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoteResponse.swift; sourceTree = "<group>"; };
+		A4F8F03D30BFE7A611BBBCC7 /* Language.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
+		A52E0DC4228DE98AAFFCCC8B /* DiscoverViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverViewModel.swift; sourceTree = "<group>"; };
+		A6627BFB2223DA82DA106D68 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		A752136A0810EDCAFFEA4B91 /* AppErrorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppErrorTests.swift; sourceTree = "<group>"; };
+		AB2F53052C38132DAFC9745A /* RadioBrowserServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioBrowserServiceTests.swift; sourceTree = "<group>"; };
+		BC5BA356A2871D1C395A7EF5 /* TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHelpers.swift; sourceTree = "<group>"; };
+		EE6E23DEEA994593218C911D /* ClickResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickResponse.swift; sourceTree = "<group>"; };
+		F63B79986F927C69603966A9 /* ModelDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDecodingTests.swift; sourceTree = "<group>"; };
+		F66EA829D34D4EC1A0BC6994 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
+		FC5C8200DDC0967BEFBBED67 /* StationDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationDTO.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		3BC834AA89C288C8D4D22AFC = {
+			isa = PBXGroup;
+			children = (
+				4EAF5A50BB867D105D02ABAB /* RadioLibre */,
+				BEA0035312F700F6487021D9 /* RadioLibreTests */,
+				48D916BE8A95292104D22AA0 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		48D916BE8A95292104D22AA0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				19C1E892D2B35329A72E7C3A /* RadioLibre.app */,
+				4726088C89EBA8730F05959D /* RadioLibreTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4E615A72F097ABF796F6AD24 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				AB2F53052C38132DAFC9745A /* RadioBrowserServiceTests.swift */,
+				4AFBA3AB104CA86C6F3FB1BD /* ServerDiscoveryServiceTests.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		4EAF5A50BB867D105D02ABAB /* RadioLibre */ = {
+			isa = PBXGroup;
+			children = (
+				D9D174A7F12CF3728BABC95E /* App */,
+				9C70784073D7B3D8D1818164 /* Models */,
+				E3CBA30E748606CAA2C0B2F1 /* Resources */,
+				BCF3D1A2A5F7E545C1C52719 /* Services */,
+				E7C0DCF934EF5950D2AAC38A /* ViewModels */,
+				5EDB8436DDAC865D83FE6E7A /* Views */,
+			);
+			path = RadioLibre;
+			sourceTree = "<group>";
+		};
+		5B50952E1A60CE573331E0FC /* Discover */ = {
+			isa = PBXGroup;
+			children = (
+				21516389A7987634EC8D58B7 /* DiscoverView.swift */,
+			);
+			path = Discover;
+			sourceTree = "<group>";
+		};
+		5EDB8436DDAC865D83FE6E7A /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				F66EA829D34D4EC1A0BC6994 /* RootTabView.swift */,
+				D1A50AD980182838B498A114 /* Common */,
+				5B50952E1A60CE573331E0FC /* Discover */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		9C70784073D7B3D8D1818164 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				29BF82FFA791BD2632B233EF /* AppError.swift */,
+				EE6E23DEEA994593218C911D /* ClickResponse.swift */,
+				3E89F266018FC79BD64C511D /* Country.swift */,
+				A4F8F03D30BFE7A611BBBCC7 /* Language.swift */,
+				4B48048AAE0967D28DCD5452 /* ServerStats.swift */,
+				FC5C8200DDC0967BEFBBED67 /* StationDTO.swift */,
+				498C8ED846A133D224EC72D0 /* Tag.swift */,
+				9380A23EA815CB9037FE4D94 /* VoteResponse.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		BBCD1E1B56E55248AD13713E /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				2847C72127CDDC0DB8DE9A95 /* DiscoverViewModelTests.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		BCF3D1A2A5F7E545C1C52719 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				22027F1CAADDA962D657EE80 /* DNSResolver.swift */,
+				62E2077974D7A2297C57D775 /* RadioBrowserService.swift */,
+				40FEAFDFCB51946252BE13C6 /* ServerDiscoveryService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		BEA0035312F700F6487021D9 /* RadioLibreTests */ = {
+			isa = PBXGroup;
+			children = (
+				CF514FB28A76FF943FD5D0EB /* Helpers */,
+				F06C00A718A29FB1BC8FA116 /* Models */,
+				4E615A72F097ABF796F6AD24 /* Services */,
+				BBCD1E1B56E55248AD13713E /* ViewModels */,
+				D52E9AB0DA92CB58BB12687B /* Views */,
+			);
+			path = RadioLibreTests;
+			sourceTree = "<group>";
+		};
+		CF514FB28A76FF943FD5D0EB /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				7B88EA5A5597FFB07E673600 /* MockURLProtocol.swift */,
+				BC5BA356A2871D1C395A7EF5 /* TestHelpers.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		D1A50AD980182838B498A114 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				058909C27A4677C163E35084 /* ErrorView.swift */,
+				8D1E6BFF9337B872EF703968 /* LoadingView.swift */,
+				45AC25015583C05268EF261B /* StationRowView.swift */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
+		D52E9AB0DA92CB58BB12687B /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				4F3C59250AB9AA3DF70BFDA1 /* ErrorViewTests.swift */,
+				346BC269194DDF252A040AE7 /* LoadingViewTests.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		D9D174A7F12CF3728BABC95E /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A6627BFB2223DA82DA106D68 /* Info.plist */,
+				0BB779333233F074F4AD4EAB /* RadioLibreApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		E3CBA30E748606CAA2C0B2F1 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				022DDD76BA5F5AA63185D913 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		E7C0DCF934EF5950D2AAC38A /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				A52E0DC4228DE98AAFFCCC8B /* DiscoverViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		F06C00A718A29FB1BC8FA116 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A752136A0810EDCAFFEA4B91 /* AppErrorTests.swift */,
+				F63B79986F927C69603966A9 /* ModelDecodingTests.swift */,
+				6E174624D0348300DD545D35 /* StationDTOTests.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		382FF616E833AD032879D1E5 /* RadioLibre */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FA0BD4DCED68C866E5C17F0A /* Build configuration list for PBXNativeTarget "RadioLibre" */;
+			buildPhases = (
+				C161F6F373F63D3050132959 /* Sources */,
+				F178693B17C4F4FE809753A7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RadioLibre;
+			packageProductDependencies = (
+			);
+			productName = RadioLibre;
+			productReference = 19C1E892D2B35329A72E7C3A /* RadioLibre.app */;
+			productType = "com.apple.product-type.application";
+		};
+		F7E5F15E3AFF418DF603F3BC /* RadioLibreTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3C2CB7E829FAAB82F697C597 /* Build configuration list for PBXNativeTarget "RadioLibreTests" */;
+			buildPhases = (
+				8AC7A2610435A353E7262FBD /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AEC6E28856854F47C6ACC9C9 /* PBXTargetDependency */,
+			);
+			name = RadioLibreTests;
+			packageProductDependencies = (
+			);
+			productName = RadioLibreTests;
+			productReference = 4726088C89EBA8730F05959D /* RadioLibreTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		DC2C8CD371698E8F283C037A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 9398FB01B892254A759A9651 /* Build configuration list for PBXProject "RadioLibre" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 3BC834AA89C288C8D4D22AFC;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 48D916BE8A95292104D22AA0 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				382FF616E833AD032879D1E5 /* RadioLibre */,
+				F7E5F15E3AFF418DF603F3BC /* RadioLibreTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F178693B17C4F4FE809753A7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1B965A60B53C8F097B107CB /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8AC7A2610435A353E7262FBD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B08080EBA0EEFD8DFD2BF449 /* AppErrorTests.swift in Sources */,
+				3C9458A7F799B6F45AF9F9AE /* DiscoverViewModelTests.swift in Sources */,
+				E1F6B9AF026F406BBAD3EE7E /* ErrorViewTests.swift in Sources */,
+				632FFBED715691AE269125CB /* LoadingViewTests.swift in Sources */,
+				DFD4E4E0974651C80D9A5CA7 /* MockURLProtocol.swift in Sources */,
+				140E66CA28C57B18E2B279BD /* ModelDecodingTests.swift in Sources */,
+				4A7DA36E31F32541F10F3FD8 /* RadioBrowserServiceTests.swift in Sources */,
+				2D589772D5C869B68DEA1B6D /* ServerDiscoveryServiceTests.swift in Sources */,
+				DE7D7E284AC79788CA5B54E3 /* StationDTOTests.swift in Sources */,
+				DB3EACA2405AD8CDB6CCFB95 /* TestHelpers.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C161F6F373F63D3050132959 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2EC3CD43539CEB35DD02F287 /* AppError.swift in Sources */,
+				BC9AB3777A24950E57F10B93 /* ClickResponse.swift in Sources */,
+				6449FC141671C3B9F6555A36 /* Country.swift in Sources */,
+				F0A0FB742EB09B5D6FA19C0A /* DNSResolver.swift in Sources */,
+				82811EF06346BA7E60FFD244 /* DiscoverView.swift in Sources */,
+				DFA08517DD3BAA94525C250F /* DiscoverViewModel.swift in Sources */,
+				A736E886FE50B967A4DE61BC /* ErrorView.swift in Sources */,
+				74E9EF39CC7DD109BBAF8122 /* Language.swift in Sources */,
+				F38645643D350108DD204B25 /* LoadingView.swift in Sources */,
+				76DD3E814CEA4567B3F0BAE0 /* RadioBrowserService.swift in Sources */,
+				2E520977399172EC1261594C /* RadioLibreApp.swift in Sources */,
+				DF8CAB02F93D7B7A735E775D /* RootTabView.swift in Sources */,
+				7FB3230E599B73C01F0C2288 /* ServerDiscoveryService.swift in Sources */,
+				72C9131E2CA834C047216FD8 /* ServerStats.swift in Sources */,
+				7A39F56AE5FBA5FB19867E72 /* StationDTO.swift in Sources */,
+				B80C18203A75084DF6880926 /* StationRowView.swift in Sources */,
+				473F8EF5B16C230E725C5721 /* Tag.swift in Sources */,
+				D7D59E52991CAA3E17EB10CF /* VoteResponse.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AEC6E28856854F47C6ACC9C9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 382FF616E833AD032879D1E5 /* RadioLibre */;
+			targetProxy = A79866D1E29A4B274F6183AF /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		25564264EFCD8F313401D147 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = RadioLibre/App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.radiolibre.app;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		3031687F2DDBBA024F92601F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.radiolibre.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RadioLibre.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RadioLibre";
+			};
+			name = Release;
+		};
+		653F2EC21636854455F735F0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		8AB1CEE726F8BFA9EBA6F7A4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		C304AE021D47077B98CFB595 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = RadioLibre/App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.radiolibre.app;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C5529CD524353A639A0B340E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.radiolibre.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RadioLibre.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RadioLibre";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3C2CB7E829FAAB82F697C597 /* Build configuration list for PBXNativeTarget "RadioLibreTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C5529CD524353A639A0B340E /* Debug */,
+				3031687F2DDBBA024F92601F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9398FB01B892254A759A9651 /* Build configuration list for PBXProject "RadioLibre" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8AB1CEE726F8BFA9EBA6F7A4 /* Debug */,
+				653F2EC21636854455F735F0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FA0BD4DCED68C866E5C17F0A /* Build configuration list for PBXNativeTarget "RadioLibre" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C304AE021D47077B98CFB595 /* Debug */,
+				25564264EFCD8F313401D147 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = DC2C8CD371698E8F283C037A /* Project object */;
+}

@@ -1,0 +1,68 @@
+name: RadioLibre
+options:
+  bundleIdPrefix: com.radiolibre
+  deploymentTarget:
+    iOS: "16.0"
+  xcodeVersion: "15.0"
+  minimumXcodeGenVersion: "2.30"
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+
+targets:
+  RadioLibre:
+    type: application
+    platform: iOS
+    sources:
+      - RadioLibre
+    settings:
+      base:
+        INFOPLIST_FILE: RadioLibre/App/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.radiolibre.app
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        GENERATE_INFOPLIST_FILE: false
+    info:
+      path: RadioLibre/App/Info.plist
+      properties:
+        CFBundleDevelopmentRegion: en
+        CFBundleExecutable: $(EXECUTABLE_NAME)
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+        CFBundleInfoDictionaryVersion: "6.0"
+        CFBundleName: $(PRODUCT_NAME)
+        CFBundlePackageType: $(PRODUCT_TYPE)
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSRequiresIPhoneOS: true
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UIBackgroundModes:
+          - audio
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoadsForMedia: true
+
+  RadioLibreTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - RadioLibreTests
+    dependencies:
+      - target: RadioLibre
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.radiolibre.tests
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/RadioLibre.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RadioLibre
+        BUNDLE_LOADER: $(TEST_HOST)
+        GENERATE_INFOPLIST_FILE: true
