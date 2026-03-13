@@ -12,4 +12,8 @@ This app is being built mostly using Claude Code. Relevant files:
 
 - [SPEC.md](SPEC.md) — this is the behavioral truth. Every UI behavior, API call, and edge case defined here.
 - [PLAN.md](PLAN.md) — this is the architectural guide. It defines the file structure, patterns, and phased delivery.
-- [.claude/commands/implement.md](.claude/commands/implement.md) - Skill to implement new features by running `/implement audio playback`. 
+- [.claude/commands/implement.md](.claude/commands/implement.md) - Skill to implement new features by running `/implement audio playback`.
+
+## Attribution
+
+This app icon uses the svg version of [Levitating, Meditating, Flute-playing Gnu](https://www.gnu.org/graphics/meditate.html).

@@ -67,7 +67,7 @@
 		058909C27A4677C163E35084 /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
 		0BB779333233F074F4AD4EAB /* RadioLibreApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioLibreApp.swift; sourceTree = "<group>"; };
 		12CFDA5295E7D55B6FF4DFC4 /* PlayerViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewModelTests.swift; sourceTree = "<group>"; };
-		19C1E892D2B35329A72E7C3A /* RadioLibre.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = RadioLibre.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		19C1E892D2B35329A72E7C3A /* RadioLibre.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RadioLibre.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		21516389A7987634EC8D58B7 /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
 		22027F1CAADDA962D657EE80 /* DNSResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSResolver.swift; sourceTree = "<group>"; };
 		24C9C8793A05D81B03DD175B /* MiniPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniPlayerView.swift; sourceTree = "<group>"; };
@@ -107,6 +107,7 @@
 		F63B79986F927C69603966A9 /* ModelDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDecodingTests.swift; sourceTree = "<group>"; };
 		F66EA829D34D4EC1A0BC6994 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
 		FC5C8200DDC0967BEFBBED67 /* StationDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationDTO.swift; sourceTree = "<group>"; };
+		1A2B3C4D5E6F7A8B9C0D1E2F /* RadioLibre.icon */ = {isa = PBXFileReference; lastKnownFileType = folder; name = RadioLibre.icon; path = Assets.xcassets/RadioLibre.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -280,6 +281,7 @@
 			isa = PBXGroup;
 			children = (
 				022DDD76BA5F5AA63185D913 /* Assets.xcassets */,
+				1A2B3C4D5E6F7A8B9C0D1E2F /* RadioLibre.icon */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -352,8 +354,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1500;
-				TargetAttributes = {
-				};
 			};
 			buildConfigurationList = 9398FB01B892254A759A9651 /* Build configuration list for PBXProject "RadioLibre" */;
 			developmentRegion = en;
@@ -457,8 +457,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_ICON_COMPOSER_FILE = RadioLibre/Resources/Assets.xcassets/RadioLibre.icon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 98QC42V45R;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = RadioLibre/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -612,8 +614,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_ICON_COMPOSER_FILE = RadioLibre/Resources/Assets.xcassets/RadioLibre.icon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 98QC42V45R;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = RadioLibre/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
