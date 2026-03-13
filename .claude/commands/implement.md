@@ -5,7 +5,7 @@ argument-hint: <feature-or-area>
 
 You are implementing a feature for the RadioLibre iOS app. The user has requested: **$ARGUMENTS**
 
-Follow these 7 steps in order. Do not skip steps.
+Follow these 8 steps in order. Do not skip steps.
 
 ---
 
@@ -110,3 +110,21 @@ Before declaring done:
 2. **Re-read the relevant sections of PLAN.md** — verify the implementation follows the prescribed architecture (correct layers, correct patterns, correct file locations).
 3. **Run the full test suite one final time** to confirm everything passes.
 4. **Summarize** what was built: files created/modified, features implemented, test coverage, and any known limitations or deferred work.
+
+---
+
+## Step 8: Update Docs
+
+Update `SPEC.md` and `PLAN.md` with any decisions and edge cases discovered during implementation:
+
+1. **SPEC.md** — Add or refine behavioral details, edge cases, error scenarios, or UI states that were discovered or clarified during implementation but were not originally documented. Keep the same style and structure as the existing spec.
+2. **PLAN.md** — Document architectural decisions made during implementation: API quirks encountered, patterns chosen over alternatives, deviations from the original plan with rationale, and any gotchas future implementers should know about. Add notes inline near the relevant component specifications.
+3. **PLAN.md — Implementation Notes** — At the end of the relevant phase section, add an `**Implementation notes (Phase N):**` block capturing lessons learned during this implementation. Include:
+   - **Mistakes made and how they were fixed** — build errors, incorrect assumptions, API misunderstandings, wrong patterns tried first. Be specific: what went wrong, why, and what the fix was.
+   - **Non-obvious patterns that worked** — solutions that weren't obvious from the spec/plan but turned out to be necessary (e.g., workarounds for framework quirks, specific initialization orders, threading constraints).
+   - **Corrections to the plan** — anywhere the plan was wrong, incomplete, or misleading. Fix the plan inline AND note what was wrong so the same mistake isn't repeated.
+   - **Time sinks to avoid** — anything that took multiple iterations to get right, so future implementations can go straight to the working approach.
+
+   The goal is to make PLAN.md a living document that gets smarter with each implementation pass. Future runs of `/implement` read these notes and avoid repeating the same mistakes.
+
+**Do not** rewrite existing content that is still accurate — only add new information or correct details that turned out to be wrong. Keep additions concise and factual.
