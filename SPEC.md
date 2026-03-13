@@ -303,7 +303,7 @@ When playback stops, clear all info.
 
 ### Mini Player
 
-Persistent bar above the tab bar. Only visible when a station is loaded.
+Persistent bar above the tab bar. Always visible; shows idle state when no station is loaded.
 
 Shows: favicon (40×40), station name, codec + bitrate, play/pause button, stop button. Spinner replaces play/pause button when buffering. Subtitle shows "Connecting..." when loading, error message (in red) on error, codec + bitrate otherwise. Translucent background.
 

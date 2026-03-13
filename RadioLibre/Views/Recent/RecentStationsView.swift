@@ -123,6 +123,7 @@ private struct RecentStationRow: View {
                         .foregroundStyle(.secondary)
                 }
             }
+            .contentShape(Rectangle())
             .padding(.vertical, 4)
             .opacity(isConnecting ? 0.6 : 1.0)
         }
