@@ -5,7 +5,7 @@ argument-hint: <feature-or-area>
 
 You are implementing a feature for the RadioLibre iOS app. The user has requested: **$ARGUMENTS**
 
-Follow these 8 steps in order. Do not skip steps.
+Follow these 9 steps in order. Do not skip steps.
 
 ---
 
@@ -113,7 +113,24 @@ Before declaring done:
 
 ---
 
-## Step 8: Update Docs
+## Step 8: Self Code Review
+
+Re-read every file you created or modified in this implementation. Review with a critical eye as if reviewing someone else's PR:
+
+1. **Bugs** — Logic errors, off-by-one, missing guards, incorrect state transitions, race conditions, unhandled edge cases. Pay special attention to:
+   - Parameters accepted but never used
+   - State that can become inconsistent (e.g., offset advances but data doesn't load)
+   - Task cancellation paths that leave dirty state or show wrong errors
+   - Async code that doesn't check for cancellation after an `await`
+2. **Spec compliance** — Compare each behavior against SPEC.md line by line. Are all states handled? Are error messages correct? Are sort orders, page sizes, and limits exactly as specified?
+3. **Conventions** — Does the code follow the project's established patterns? Correct architecture layer, naming, isolation (`actor` vs `@MainActor`), no Combine, etc.
+4. **Design** — Unnecessary complexity, dead code, unused parameters, duplicated logic, missing abstractions (or premature abstractions).
+
+**Fix every bug you find.** For design observations that don't warrant a fix, note them briefly. After fixing, re-run `xcodegen generate` (if files changed) and the full test suite to confirm nothing broke.
+
+---
+
+## Step 9: Update Docs
 
 Update `SPEC.md` and `PLAN.md` with any decisions and edge cases discovered during implementation:
 

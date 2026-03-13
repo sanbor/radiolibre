@@ -1162,6 +1162,14 @@ struct RadioLibreApp: App {
 
 **Verify:** Can search by name, browse countries/languages/tags, drill into station lists with pagination.
 
+**Implementation notes (Phase 3):**
+- **`.searchable` + `@Published` query binding:** SwiftUI's `.searchable(text:)` binds directly to `$viewModel.query`. Debounce is handled by calling `viewModel.onQueryChanged()` from `.onChange(of: viewModel.query)` in the view, which cancels/creates a `Task` with `Task.sleep(nanoseconds: 400_000_000)`. This is cleaner than `didSet` on the `@Published` property.
+- **BrowseViewModel per category view:** Each category view (`CountryListView`, `LanguageListView`, `TagListView`) creates its own `@StateObject` BrowseViewModel. This is intentional — each view only calls its own load method, and the views are separate NavigationLink destinations that load lazily.
+- **StationListView init with `@StateObject`:** The `StationListView` receives a `Filter` enum and creates its `StationListViewModel` via `StateObject(wrappedValue:)` in the init. The `title` parameter in `init` is unused directly since the VM derives its own title — the `StationListView` uses `viewModel.title` for the navigation title.
+- **Offset rollback on loadMore error:** When `loadMore()` fails, the offset is decremented back so the user can retry loading the same page. Without this, the offset would advance past data that was never loaded.
+- **Test scheme name:** The Xcode project has a single scheme `RadioLibre` (not `RadioLibreTests`). Tests must be run via `xcodebuild -scheme RadioLibre test`, not `-scheme RadioLibreTests`.
+- **Favorites tab placeholder:** Added as a simple NavigationStack with "No favorites yet" text and heart icon, ready for Phase 4 to replace with real FavoritesView.
+
 ### Phase 4: Persistence
 **Goal:** Favorites and history persist across app restarts.
 
