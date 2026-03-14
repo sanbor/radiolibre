@@ -37,28 +37,13 @@ struct RootTabView: View {
                     Label("Browse", systemImage: "list.bullet")
                 }
 
-            favoritesPlaceholder
+            FavoritesView()
                 .safeAreaInset(edge: .bottom, spacing: 0) {
                     MiniPlayerView()
                 }
                 .tabItem {
                     Label("Favorites", systemImage: "heart.fill")
                 }
-        }
-    }
-
-    private var favoritesPlaceholder: some View {
-        NavigationStack {
-            VStack(spacing: 16) {
-                Image(systemName: "heart")
-                    .font(.system(size: 48))
-                    .foregroundStyle(.secondary)
-                Text("No favorites yet")
-                    .font(.headline)
-                    .foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .navigationTitle("Favorites")
         }
     }
 }

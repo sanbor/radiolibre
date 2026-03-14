@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct StationRowView: View {
+    @EnvironmentObject private var favoritesVM: FavoritesViewModel
+
     let station: StationDTO
     var isConnecting: Bool = false
     var onTap: (() -> Void)?
@@ -39,6 +41,18 @@ struct StationRowView: View {
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                     }
+
+                    if !isConnecting, let locationLabel = station.locationLabel {
+                        HStack(spacing: 4) {
+                            if let flag = station.flagEmoji {
+                                Text(flag).font(.caption2)
+                            }
+                            Text(locationLabel)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                        }
+                    }
                 }
 
                 Spacer()
@@ -64,5 +78,20 @@ struct StationRowView: View {
             .opacity(isConnecting ? 0.6 : 1.0)
         }
         .buttonStyle(.plain)
+        .swipeActions(edge: .leading) {
+            Button {
+                Task {
+                    if favoritesVM.isFavorite(stationuuid: station.stationuuid) {
+                        await favoritesVM.removeFavorite(stationuuid: station.stationuuid)
+                    } else {
+                        await favoritesVM.addFavorite(station: station)
+                    }
+                }
+            } label: {
+                Image(systemName: favoritesVM.isFavorite(stationuuid: station.stationuuid)
+                    ? "heart.slash.fill" : "heart.fill")
+            }
+            .tint(.pink)
+        }
     }
 }

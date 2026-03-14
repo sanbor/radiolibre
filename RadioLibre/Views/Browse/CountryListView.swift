@@ -36,7 +36,7 @@ struct CountryListView: View {
                 StationListView(filter: .country(country.iso_3166_1), title: country.name)
             } label: {
                 HStack {
-                    Text(country.iso_3166_1.flagEmoji)
+                    Text(getFlag(from: country.iso_3166_1))
                         .font(.title2)
                     Text(country.name)
                     Spacer()

@@ -172,6 +172,46 @@ final class StationDTOTests: XCTestCase {
         XCTAssertEqual(StationDTOTests.makeStation(bitrate: 0).bitrateLabel, "—")
     }
 
+    // MARK: - Flag Emoji
+
+    func testGetFlagNormalizesCase() {
+        XCTAssertEqual(getFlag(from: "FR"), "🇫🇷")
+        XCTAssertEqual(getFlag(from: "us"), "🇺🇸")
+        XCTAssertEqual(getFlag(from: "de"), "🇩🇪")
+    }
+
+    func testFlagEmojiValidCode() {
+        let station = StationDTOTests.makeStation(countrycode: "FR")
+        XCTAssertEqual(station.flagEmoji, "🇫🇷")
+    }
+
+    func testFlagEmojiNilWhenNil() {
+        let station = StationDTOTests.makeStation(countrycode: nil)
+        XCTAssertNil(station.flagEmoji)
+    }
+
+    func testFlagEmojiNilWhenInvalid() {
+        let station = StationDTOTests.makeStation(countrycode: "X")
+        XCTAssertNil(station.flagEmoji)
+    }
+
+    // MARK: - Location Label
+
+    func testLocationLabelCountry() {
+        let station = StationDTOTests.makeStation(countrycode: "DE")
+        XCTAssertEqual(station.locationLabel, "DE")
+    }
+
+    func testLocationLabelNilWhenNil() {
+        let station = StationDTOTests.makeStation()
+        XCTAssertNil(station.locationLabel)
+    }
+
+    func testLocationLabelNilWhenEmpty() {
+        let station = StationDTOTests.makeStation(countrycode: "")
+        XCTAssertNil(station.locationLabel)
+    }
+
     // MARK: - Hashable
 
     func testEqualWhenAllFieldsMatch() {
@@ -233,7 +273,9 @@ final class StationDTOTests: XCTestCase {
         homepage: String? = nil,
         favicon: String? = nil,
         tags: String? = nil,
+        country: String? = nil,
         countrycode: String? = nil,
+        state: String? = nil,
         codec: String? = nil,
         bitrate: Int? = nil,
         hls: Int? = nil,
@@ -247,9 +289,9 @@ final class StationDTOTests: XCTestCase {
             homepage: homepage,
             favicon: favicon,
             tags: tags,
-            country: nil,
+            country: country,
             countrycode: countrycode,
-            state: nil,
+            state: state,
             language: nil,
             languagecodes: nil,
             codec: codec,

@@ -3,6 +3,7 @@ import SwiftUI
 struct RecentStationsView: View {
     @StateObject private var viewModel = RecentStationsViewModel()
     @EnvironmentObject private var playerVM: PlayerViewModel
+    @EnvironmentObject private var favoritesVM: FavoritesViewModel
 
     var body: some View {
         NavigationStack {
@@ -57,6 +58,22 @@ struct RecentStationsView: View {
                     && playerVM.currentStation?.stationuuid == entry.stationuuid
                 RecentStationRow(entry: entry, isConnecting: isConnecting) {
                     playerVM.play(station: entry.toStationDTO())
+                }
+                .swipeActions(edge: .leading) {
+                    Button {
+                        let station = entry.toStationDTO()
+                        Task {
+                            if favoritesVM.isFavorite(stationuuid: entry.stationuuid) {
+                                await favoritesVM.removeFavorite(stationuuid: entry.stationuuid)
+                            } else {
+                                await favoritesVM.addFavorite(station: station)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: favoritesVM.isFavorite(stationuuid: entry.stationuuid)
+                            ? "heart.slash.fill" : "heart.fill")
+                    }
+                    .tint(.pink)
                 }
             }
         }

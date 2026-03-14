@@ -56,6 +56,16 @@ struct StationDTO: Codable, Identifiable, Hashable, Sendable {
         return "\(bitrate)k"
     }
 
+    var flagEmoji: String? {
+        guard let countrycode, countrycode.count == 2 else { return nil }
+        return getFlag(from: countrycode)
+    }
+
+    var locationLabel: String? {
+        guard let countrycode, countrycode.count == 2 else { return nil }
+        return countrycode.uppercased()
+    }
+
     enum CodingKeys: String, CodingKey {
         case stationuuid, name, url
         case urlResolved = "url_resolved"
