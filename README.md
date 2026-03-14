@@ -73,3 +73,9 @@ GitHub Actions runs build and tests on every push and PR to `main` (see `.github
 ## Attribution
 
 This app icon uses the svg version of [Levitating, Meditating, Flute-playing Gnu](https://www.gnu.org/graphics/meditate.html).
+
+Special thanks to [Radio Browser](https://www.radio-browser.info/) which provides the radio data. You can make a
+[donation (one time or repeating)](https://ko-fi.com/segleralex) or
+[contribute in other ways](https://www.radio-browser.info/faq).
+
+Also to [RadioDroid](https://github.com/segler-alex/RadioDroid) from which this project is inspired.
