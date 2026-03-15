@@ -7,7 +7,7 @@ struct StationCardView: View {
     var body: some View {
         Button(action: onTap) {
             VStack(spacing: 8) {
-                FaviconImageView(url: station.faviconURL, size: 80)
+                FaviconImageView(url: station.faviconURL, size: 64)
 
                 Text(station.name)
                     .font(.caption)
@@ -16,16 +16,21 @@ struct StationCardView: View {
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.primary)
 
-                if let codec = station.codec, !codec.isEmpty {
-                    Text("\(codec) · \(station.bitrateLabel)")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
+                if let country = station.country, !country.isEmpty {
+                    HStack(spacing: 2) {
+                        if let flag = station.flagEmoji {
+                            Text(flag).font(.caption2)
+                        }
+                        Text(country)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
                 }
             }
-            .frame(width: 140)
+            .frame(width: 120)
             .padding(.vertical, 10)
-            .padding(.horizontal, 6)
+            .padding(.horizontal, 8)
             .background(Color(.systemGray6))
             .clipShape(RoundedRectangle(cornerRadius: 12))
         }

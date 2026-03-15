@@ -72,9 +72,17 @@ struct StationRowView: View {
                             .clipShape(Capsule())
                     }
 
-                    Text(station.bitrateLabel)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+                    if let country = station.country, !country.isEmpty {
+                        HStack(spacing: 2) {
+                            if let flag = station.flagEmoji {
+                                Text(flag).font(.caption2)
+                            }
+                            Text(country)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                        }
+                    }
                 }
             }
             .contentShape(Rectangle())

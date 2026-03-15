@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MiniPlayerView: View {
     @EnvironmentObject private var playerVM: PlayerViewModel
+    @EnvironmentObject private var favoritesVM: FavoritesViewModel
     @State private var showFullPlayer = false
 
     var body: some View {
@@ -25,6 +26,24 @@ struct MiniPlayerView: View {
 
     private func activeContent(station: StationDTO) -> some View {
         HStack(spacing: 12) {
+            Button {
+                Task {
+                    if favoritesVM.isFavorite(stationuuid: station.stationuuid) {
+                        await favoritesVM.removeFavorite(stationuuid: station.stationuuid)
+                    } else {
+                        await favoritesVM.addFavorite(station: station)
+                    }
+                }
+            } label: {
+                Image(systemName: favoritesVM.isFavorite(stationuuid: station.stationuuid) ? "heart.fill" : "heart")
+                    .font(.body)
+                    .frame(width: 32, height: 32)
+            }
+            .buttonStyle(.plain)
+            .tint(.pink)
+            .foregroundStyle(.pink)
+            .accessibilityLabel(favoritesVM.isFavorite(stationuuid: station.stationuuid) ? "Remove from Favorites" : "Add to Favorites")
+
             FaviconImageView(url: station.faviconURL, size: 40)
 
             VStack(alignment: .leading, spacing: 2) {
