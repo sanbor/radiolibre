@@ -3,6 +3,8 @@ import Combine
 
 @MainActor
 final class PlayerViewModel: ObservableObject {
+    static let shared = PlayerViewModel(audioService: .shared)
+
     let audioService: AudioPlayerService
     private let radioBrowserService: RadioBrowserService
     private let historyService: HistoryService

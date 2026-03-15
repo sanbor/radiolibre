@@ -57,7 +57,7 @@
 | M3U export/import | M3U with `#RADIOBROWSERUUID:` | FileDocument export, file picker import |
 | Equalizer | System equalizer intent | N/A (iOS has no system EQ API) |
 | Server statistics | Stats view | `/json/stats` |
-| CarPlay | Android Auto MediaBrowserService | `CPTemplate` integration |
+| ~~CarPlay~~ | ~~Android Auto MediaBrowserService~~ | ~~`CPTemplate` integration~~ — **Done (Phase 8)** |
 | Widgets | N/A | WidgetKit for now-playing + favorites |
 | Siri Shortcuts | N/A | `AppIntent` for "Play [station name]" |
 | Metered connection warning | Dialog before playback on mobile | `NWPathMonitor` check for `.constrained` |
@@ -266,7 +266,10 @@ RadioLibre/
 ├── RadioLibre/
 │   ├── App/
 │   │   ├── RadioLibreApp.swift                 # @main, SwiftData container, environment setup
-│   │   └── Info.plist                          # Background modes, ATS exceptions
+│   │   └── Info.plist                          # Background modes, ATS exceptions, CarPlay scene
+│   │
+│   ├── CarPlay/
+│   │   └── CarPlaySceneDelegate.swift          # CPTemplateApplicationSceneDelegate: browse & play from car display
 │   │
 │   ├── Models/
 │   │   ├── StationDTO.swift                    # Codable API response model
@@ -1272,6 +1275,27 @@ struct RadioLibreApp: App {
 8. UI tests for critical flows: search → play, browse → play, favorite toggle
 9. Physical device testing: background audio, AirPlay, interruptions
 
+### Phase 8: CarPlay
+**Goal:** Browse and play stations from the car's display.
+
+1. `CarPlaySceneDelegate.swift` — `CPTemplateApplicationSceneDelegate` with tab bar (Favorites, Recent, Popular, Now Playing)
+2. Add `PlayerViewModel.shared` singleton for cross-scene access
+3. Update `RadioLibreApp.swift` to use `PlayerViewModel.shared`
+4. Add `CPTemplateApplicationSceneSessionRoleApplication` to `project.yml` and `Info.plist`
+5. `CarPlaySceneDelegateTests.swift` — detail text formatting and station mapping tests
+
+**Implementation notes (Phase 8):**
+- **4 tabs:** Favorites → Recent → Popular → Now Playing. CarPlay allows max 4–5 tabs; Now Playing is required by Apple HIG for audio apps.
+- **`PlayerViewModel.shared`** (not `AudioPlayerService` directly): `play(station:)` records history, keeping the Recent tab accurate. Same approach as the phone UI.
+- **Reload on tab select + scene active:** No Combine observers or NotificationCenter. Data sets are small, service calls are fast. Standard CarPlay pattern.
+- **`CPNowPlayingTemplate` reads from `MPNowPlayingInfoCenter` automatically** — `NowPlayingService` already configures this, so zero additional work.
+- **Image loading:** Sync memory cache via `ImageCacheService.cachedImage(for:)` at init, then async-load via `ImageCacheService.image(for:)` and call `listItem.setImage()` when ready. Placeholder: SF Symbol `radio`.
+- **`didDisconnect` in extension:** Moved to an extension to silence a compiler warning about nearly matching an unrelated optional protocol requirement.
+- **Entitlement note:** `com.apple.developer.carplay-audio` is required when code signing is enabled. Currently `CODE_SIGNING_ALLOWED: "NO"`, so no entitlements file is needed.
+- **No availability checks needed:** CPTemplate APIs available since iOS 14, app targets iOS 16.
+
+**Verify:** `xcodegen generate` succeeds, `xcodebuild build` succeeds, all existing tests pass, CarPlay Simulator shows tabs with station lists.
+
 ---
 
 ## Post-MVP Roadmap
@@ -1281,10 +1305,9 @@ These features can be added after the core app is stable:
 1. **Sleep Timer** — countdown timer that stops playback
 2. **Stream Recording** — capture audio to file using `AVAssetWriter`
 3. **Track History** — display ICY metadata (artist/track) from stream
-4. **CarPlay** — `CPTemplate`-based interface for in-car use
-5. **Widgets** — WidgetKit for now-playing and favorite stations
-6. **Siri Shortcuts** — `AppIntent` for "Play [station name]"
-7. **Geo Search** — find stations near current location
-8. **M3U Export/Import** — share favorites as playlist files
-9. **iPad Layout** — sidebar navigation with split view
-10. **macOS (Catalyst/native)** — menu bar player
+4. **Widgets** — WidgetKit for now-playing and favorite stations
+5. **Siri Shortcuts** — `AppIntent` for "Play [station name]"
+6. **Geo Search** — find stations near current location
+7. **M3U Export/Import** — share favorites as playlist files
+8. **iPad Layout** — sidebar navigation with split view
+9. **macOS (Catalyst/native)** — menu bar player

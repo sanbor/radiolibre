@@ -2,7 +2,7 @@ import SwiftUI
 
 @main
 struct RadioLibreApp: App {
-    @StateObject private var playerVM = PlayerViewModel(audioService: .shared)
+    @StateObject private var playerVM = PlayerViewModel.shared
     @StateObject private var favoritesVM = FavoritesViewModel()
     @StateObject private var networkMonitor = NetworkMonitorService()
 

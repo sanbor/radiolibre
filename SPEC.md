@@ -380,3 +380,41 @@ Memory tier auto-evicts under system memory pressure. Disk tier lives in the sys
 ### Favicon View
 
 Reusable image view: takes an optional URL and a size. Shows a radio icon placeholder while loading or on failure. Clips to rounded rectangle (corner radius = 20% of size). Reloads when URL changes.
+
+---
+
+## CarPlay
+
+Browse and play stations from the car's display via `CPTemplateApplicationSceneDelegate`.
+
+### Tabs
+
+| Tab | Icon | Source | Limit |
+|---|---|---|---|
+| Favorites | star.fill | `FavoritesService.allFavorites()` | All |
+| Recent | clock.fill | `HistoryService.recentEntries(limit:)` | 20 |
+| Popular | chart.line.uptrend.xyaxis | `RadioBrowserService.fetchTopByClicks(limit:)` | 30 |
+| Now Playing | play.fill | `CPNowPlayingTemplate.shared` (auto-populated from `MPNowPlayingInfoCenter`) | — |
+
+### List Items
+
+Each station list item shows:
+- **Text:** station name
+- **Detail text:** codec (uppercased) + bitrate (e.g. "MP3 128k"), omitting either part if unavailable
+- **Image:** favicon from memory cache (sync), with async load + update; SF Symbol `radio` as placeholder
+
+### Playback
+
+Tapping a list item calls `PlayerViewModel.shared.play(station:)`, which records history and triggers `NowPlayingService` — same path as the phone UI.
+
+### Data Refresh
+
+- On scene connect: reload all tabs
+- On scene becoming active: reload all tabs
+- On tab selection: reload that tab's data
+
+No Combine observers or NotificationCenter — data sets are small and service calls are fast.
+
+### Configuration
+
+Requires `CPTemplateApplicationSceneSessionRoleApplication` in `UISceneConfigurations` (Info.plist) and the `com.apple.developer.carplay-audio` entitlement when code signing is enabled.

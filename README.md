@@ -6,6 +6,7 @@ Zero ads, zero trackers, free software internet radio player for iOS powered by 
 iOS counterpart to [RadioDroid](https://github.com/segler-alex/RadioDroid) (Android).
 
 - iOS 16+, SwiftUI, no third-party dependencies
+- CarPlay support — browse Favorites, Recent, and Popular stations from your car's display
 - License: GPL-3.0
 
 ## Development
