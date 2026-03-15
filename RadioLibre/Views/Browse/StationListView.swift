@@ -60,6 +60,11 @@ struct StationListView: View {
                 }
                 .listRowSeparator(.hidden)
             }
+
+            Color.clear
+                .frame(height: 20)
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
     }

@@ -11,11 +11,12 @@ struct AlphabetIndexView: View {
             ForEach(letters, id: \.self) { letter in
                 Text(letter)
                     .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.blue)
                     .frame(width: 16, height: 16)
             }
         }
         .padding(.vertical, 4)
-        .padding(.horizontal, 2)
+        .padding(.horizontal, 6)
         .contentShape(Rectangle())
         .gesture(
             DragGesture(minimumDistance: 0, coordinateSpace: .local)

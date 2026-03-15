@@ -64,6 +64,11 @@ struct LanguageListView: View {
                     }
                     .id(section.letter)
                 }
+
+                Color.clear
+                    .frame(height: 20)
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
             }
             .listStyle(.plain)
             .overlay(alignment: .trailing) {
@@ -77,8 +82,15 @@ struct LanguageListView: View {
     }
 
     private var flatList: some View {
-        List(viewModel.sortedLanguages) { language in
-            languageRow(language)
+        List {
+            ForEach(viewModel.sortedLanguages) { language in
+                languageRow(language)
+            }
+
+            Color.clear
+                .frame(height: 20)
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
     }

@@ -76,6 +76,11 @@ struct CountryListView: View {
                     }
                     .id(section.letter)
                 }
+
+                Color.clear
+                    .frame(height: 20)
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
             }
             .listStyle(.plain)
             .overlay(alignment: .trailing) {
@@ -89,8 +94,15 @@ struct CountryListView: View {
     }
 
     private var flatList: some View {
-        List(filteredCountries) { country in
-            countryRow(country)
+        List {
+            ForEach(filteredCountries) { country in
+                countryRow(country)
+            }
+
+            Color.clear
+                .frame(height: 20)
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
     }

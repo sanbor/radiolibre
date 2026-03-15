@@ -64,6 +64,11 @@ struct TagListView: View {
                     }
                     .id(section.letter)
                 }
+
+                Color.clear
+                    .frame(height: 20)
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
             }
             .listStyle(.plain)
             .overlay(alignment: .trailing) {
@@ -77,8 +82,15 @@ struct TagListView: View {
     }
 
     private var flatList: some View {
-        List(viewModel.sortedTags) { tag in
-            tagRow(tag)
+        List {
+            ForEach(viewModel.sortedTags) { tag in
+                tagRow(tag)
+            }
+
+            Color.clear
+                .frame(height: 20)
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
     }
