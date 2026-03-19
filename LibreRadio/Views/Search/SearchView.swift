@@ -63,7 +63,11 @@ struct SearchView: View {
             ForEach(viewModel.results) { station in
                 let isConnecting = playerVM.isLoading && playerVM.currentStation?.stationuuid == station.stationuuid
                 StationRowView(station: station, isConnecting: isConnecting) {
-                    playerVM.play(station: station)
+                    let context = PlaybackContext(
+                        source: .search,
+                        stations: viewModel.results
+                    )
+                    playerVM.play(station: station, context: context)
                 }
                 .onAppear {
                     if station.id == viewModel.results.last?.id {

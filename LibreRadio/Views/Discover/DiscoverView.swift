@@ -28,7 +28,8 @@ struct DiscoverView: View {
             if !viewModel.favoriteStations.isEmpty {
                 Section {
                     StationCarouselView(title: "Favorites", stations: viewModel.favoriteStations) { station in
-                        playerVM.play(station: station)
+                        let context = PlaybackContext(source: .discoverFavorites, stations: viewModel.favoriteStations)
+                        playerVM.play(station: station, context: context)
                     }
                 }
                 .listRowInsets(EdgeInsets())
@@ -38,7 +39,8 @@ struct DiscoverView: View {
             if !viewModel.recentStations.isEmpty {
                 Section {
                     StationCarouselView(title: "Recently Played", stations: viewModel.recentStations) { station in
-                        playerVM.play(station: station)
+                        let context = PlaybackContext(source: .discoverRecent, stations: viewModel.recentStations)
+                        playerVM.play(station: station, context: context)
                     }
                 }
                 .listRowInsets(EdgeInsets())
@@ -48,7 +50,8 @@ struct DiscoverView: View {
             if !viewModel.localStations.isEmpty {
                 Section {
                     StationCarouselView(title: "Local Stations", stations: viewModel.localStations) { station in
-                        playerVM.play(station: station)
+                        let context = PlaybackContext(source: .discoverLocal, stations: viewModel.localStations)
+                        playerVM.play(station: station, context: context)
                     }
                 }
                 .listRowInsets(EdgeInsets())
@@ -58,7 +61,8 @@ struct DiscoverView: View {
             if !viewModel.topByClicks.isEmpty {
                 Section {
                     StationCarouselView(title: "Top Stations", stations: viewModel.topByClicks) { station in
-                        playerVM.play(station: station)
+                        let context = PlaybackContext(source: .discoverTopClicks, stations: viewModel.topByClicks)
+                        playerVM.play(station: station, context: context)
                     }
                 }
                 .listRowInsets(EdgeInsets())
@@ -68,7 +72,8 @@ struct DiscoverView: View {
             if !viewModel.topByVotes.isEmpty {
                 Section {
                     StationCarouselView(title: "Most Voted", stations: viewModel.topByVotes) { station in
-                        playerVM.play(station: station)
+                        let context = PlaybackContext(source: .discoverTopVotes, stations: viewModel.topByVotes)
+                        playerVM.play(station: station, context: context)
                     }
                 }
                 .listRowInsets(EdgeInsets())
@@ -78,26 +83,29 @@ struct DiscoverView: View {
             if !viewModel.recentlyChanged.isEmpty {
                 verticalSection(
                     title: "Recently Changed",
-                    stations: Array(viewModel.recentlyChanged.prefix(10))
+                    stations: Array(viewModel.recentlyChanged.prefix(10)),
+                    source: .discoverRecentlyChanged
                 )
             }
 
             if !viewModel.currentlyPlaying.isEmpty {
                 verticalSection(
                     title: "Now Playing",
-                    stations: Array(viewModel.currentlyPlaying.prefix(10))
+                    stations: Array(viewModel.currentlyPlaying.prefix(10)),
+                    source: .discoverCurrentlyPlaying
                 )
             }
         }
         .listStyle(.insetGrouped)
     }
 
-    private func verticalSection(title: String, stations: [StationDTO]) -> some View {
+    private func verticalSection(title: String, stations: [StationDTO], source: PlaybackContextSource) -> some View {
         Section(title) {
             ForEach(stations) { station in
                 let isConnecting = playerVM.isLoading && playerVM.currentStation?.stationuuid == station.stationuuid
                 StationRowView(station: station, isConnecting: isConnecting) {
-                    playerVM.play(station: station)
+                    let context = PlaybackContext(source: source, stations: stations)
+                    playerVM.play(station: station, context: context)
                 }
             }
         }

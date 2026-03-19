@@ -10,6 +10,7 @@ final class PlayerViewModelTests: XCTestCase {
     private var audioService: AudioPlayerService!
     private var historyService: HistoryService!
     private var historyDefaults: UserDefaults!
+    private var historySuiteName: String!
     private var vm: PlayerViewModel!
 
     override func setUp() async throws {
@@ -26,8 +27,9 @@ final class PlayerViewModelTests: XCTestCase {
             nowPlayingService: nowPlayingService
         )
 
-        historyDefaults = UserDefaults(suiteName: "PlayerViewModelTests")!
-        historyDefaults.removePersistentDomain(forName: "PlayerViewModelTests")
+        historySuiteName = "PlayerViewModelTests-\(UUID().uuidString)"
+        historyDefaults = UserDefaults(suiteName: historySuiteName)!
+        historyDefaults.removePersistentDomain(forName: historySuiteName)
         historyService = HistoryService(defaults: historyDefaults)
 
         vm = PlayerViewModel(
@@ -46,9 +48,11 @@ final class PlayerViewModelTests: XCTestCase {
         }
     }
 
-    override func tearDown() {
+    override func tearDown() async throws {
+        // Await any in-flight history writes to prevent cross-test contamination
+        await vm.historyTask?.value
         MockURLProtocol.requestHandler = nil
-        historyDefaults.removePersistentDomain(forName: "PlayerViewModelTests")
+        historyDefaults.removePersistentDomain(forName: historySuiteName)
     }
 
     // MARK: - Initial State
@@ -188,5 +192,107 @@ final class PlayerViewModelTests: XCTestCase {
 
         vm.stop()
         XCTAssertEqual(vm.state, audioService.state)
+    }
+
+    // MARK: - Playback Context
+
+    func testPlaySetsContext() {
+        let station = TestFixtures.makeStation()
+        let context = PlaybackContext(source: .search, stations: [station])
+        vm.play(station: station, context: context)
+
+        XCTAssertEqual(vm.playbackContext?.source, .search)
+        XCTAssertEqual(vm.playbackContext?.stations.count, 1)
+    }
+
+    func testPlayWithoutContextSetsStandalone() {
+        let station = TestFixtures.makeStation()
+        vm.play(station: station)
+
+        XCTAssertEqual(vm.playbackContext?.source, .standalone)
+        XCTAssertEqual(vm.playbackContext?.stations.count, 1)
+    }
+
+    func testPlayNextNavigatesWithinContext() async {
+        let s1 = TestFixtures.makeStation(uuid: "s1", name: "Station 1")
+        let s2 = TestFixtures.makeStation(uuid: "s2", name: "Station 2")
+        let s3 = TestFixtures.makeStation(uuid: "s3", name: "Station 3")
+        let context = PlaybackContext(source: .search, stations: [s1, s2, s3])
+        vm.play(station: s1, context: context)
+
+        await vm.playNext()
+
+        XCTAssertEqual(vm.currentStation?.stationuuid, "s2")
+    }
+
+    func testPlayNextWrapsAround() async {
+        let s1 = TestFixtures.makeStation(uuid: "s1", name: "Station 1")
+        let s2 = TestFixtures.makeStation(uuid: "s2", name: "Station 2")
+        let context = PlaybackContext(source: .search, stations: [s1, s2])
+        vm.play(station: s2, context: context)
+
+        await vm.playNext()
+
+        XCTAssertEqual(vm.currentStation?.stationuuid, "s1")
+    }
+
+    func testPlayPreviousWrapsAround() async {
+        let s1 = TestFixtures.makeStation(uuid: "s1", name: "Station 1")
+        let s2 = TestFixtures.makeStation(uuid: "s2", name: "Station 2")
+        let context = PlaybackContext(source: .search, stations: [s1, s2])
+        vm.play(station: s1, context: context)
+
+        await vm.playPrevious()
+
+        XCTAssertEqual(vm.currentStation?.stationuuid, "s2")
+    }
+
+    func testCanSkipTrackFalseForStandalone() {
+        let station = TestFixtures.makeStation()
+        vm.play(station: station)
+
+        XCTAssertFalse(vm.canSkipTrack)
+    }
+
+    func testCanSkipTrackFalseForSingleStation() {
+        let station = TestFixtures.makeStation()
+        let context = PlaybackContext(source: .search, stations: [station])
+        vm.play(station: station, context: context)
+
+        XCTAssertFalse(vm.canSkipTrack)
+    }
+
+    func testCanSkipTrackTrueForMultipleStations() {
+        let s1 = TestFixtures.makeStation(uuid: "s1", name: "Station 1")
+        let s2 = TestFixtures.makeStation(uuid: "s2", name: "Station 2")
+        let context = PlaybackContext(source: .search, stations: [s1, s2])
+        vm.play(station: s1, context: context)
+
+        XCTAssertTrue(vm.canSkipTrack)
+    }
+
+    func testPlayNextWhenStationNotInList() async {
+        let s1 = TestFixtures.makeStation(uuid: "s1", name: "Station 1")
+        let s2 = TestFixtures.makeStation(uuid: "s2", name: "Station 2")
+        let other = TestFixtures.makeStation(uuid: "other", name: "Other")
+        let context = PlaybackContext(source: .search, stations: [s1, s2])
+        vm.play(station: other, context: context)
+
+        await vm.playNext()
+
+        XCTAssertEqual(vm.currentStation?.stationuuid, "s1")
+    }
+
+    func testNewPlayOverridesContext() {
+        let s1 = TestFixtures.makeStation(uuid: "s1", name: "Station 1")
+        let s2 = TestFixtures.makeStation(uuid: "s2", name: "Station 2")
+        let favContext = PlaybackContext(source: .favorites, stations: [s1])
+        vm.play(station: s1, context: favContext)
+
+        let searchContext = PlaybackContext(source: .search, stations: [s2])
+        vm.play(station: s2, context: searchContext)
+
+        XCTAssertEqual(vm.playbackContext?.source, .search)
+        XCTAssertEqual(vm.playbackContext?.stations.count, 1)
     }
 }

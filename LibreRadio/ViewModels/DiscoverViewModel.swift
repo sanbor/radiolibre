@@ -105,5 +105,9 @@ final class DiscoverViewModel: ObservableObject {
             guard seen.insert(dto.stationuuid).inserted else { return nil }
             return dto
         }
+
+        // Remove stations already shown in Favorites
+        let favoriteIDs = Set(favoriteStations.map(\.stationuuid))
+        recentStations.removeAll { favoriteIDs.contains($0.stationuuid) }
     }
 }

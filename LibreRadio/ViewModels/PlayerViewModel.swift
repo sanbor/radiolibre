@@ -12,6 +12,7 @@ final class PlayerViewModel: ObservableObject {
     private var cancellable: AnyCancellable?
     /// Exposed for testing – lets callers await the fire-and-forget history write.
     private(set) var historyTask: Task<Void, Never>?
+    @Published private(set) var playbackContext: PlaybackContext?
 
     @MainActor
     init(
@@ -70,7 +71,18 @@ final class PlayerViewModel: ObservableObject {
 
     // MARK: - Actions
 
-    func play(station: StationDTO) {
+    var canSkipTrack: Bool {
+        guard let context = playbackContext,
+              context.source != .standalone,
+              context.stations.count > 1,
+              currentStation != nil else {
+            return false
+        }
+        return true
+    }
+
+    func play(station: StationDTO, context: PlaybackContext? = nil) {
+        playbackContext = context ?? PlaybackContext(source: .standalone, stations: [station])
         audioService.play(station: station)
         historyTask = Task {
             await historyService.recordPlay(station: station)
@@ -99,29 +111,48 @@ final class PlayerViewModel: ObservableObject {
         }
     }
 
-    func playNextFavorite() async {
-        let favorites = await favoritesService.allFavorites()
-        guard !favorites.isEmpty else { return }
+    func playNext() async {
+        guard let context = playbackContext, context.source != .standalone else { return }
+        let stations = await resolveStations(for: context)
+        guard stations.count > 1 else { return }
 
+        let nextStation: StationDTO
         if let current = currentStation,
-           let idx = favorites.firstIndex(where: { $0.stationuuid == current.stationuuid }) {
-            let next = favorites[(idx + 1) % favorites.count]
-            play(station: next.toStationDTO())
+           let idx = stations.firstIndex(where: { $0.stationuuid == current.stationuuid }) {
+            nextStation = stations[(idx + 1) % stations.count]
         } else {
-            play(station: favorites[0].toStationDTO())
+            nextStation = stations[0]
         }
+        playbackContext = PlaybackContext(source: context.source, stations: stations)
+        play(station: nextStation, context: playbackContext)
     }
 
-    func playPreviousFavorite() async {
-        let favorites = await favoritesService.allFavorites()
-        guard !favorites.isEmpty else { return }
+    func playPrevious() async {
+        guard let context = playbackContext, context.source != .standalone else { return }
+        let stations = await resolveStations(for: context)
+        guard stations.count > 1 else { return }
 
+        let prevStation: StationDTO
         if let current = currentStation,
-           let idx = favorites.firstIndex(where: { $0.stationuuid == current.stationuuid }) {
-            let prev = favorites[(idx - 1 + favorites.count) % favorites.count]
-            play(station: prev.toStationDTO())
+           let idx = stations.firstIndex(where: { $0.stationuuid == current.stationuuid }) {
+            prevStation = stations[(idx - 1 + stations.count) % stations.count]
         } else {
-            play(station: favorites[0].toStationDTO())
+            prevStation = stations[0]
+        }
+        playbackContext = PlaybackContext(source: context.source, stations: stations)
+        play(station: prevStation, context: playbackContext)
+    }
+
+    private func resolveStations(for context: PlaybackContext) async -> [StationDTO] {
+        switch context.source {
+        case .favorites, .discoverFavorites:
+            let favorites = await favoritesService.allFavorites()
+            return favorites.map { $0.toStationDTO() }
+        case .recent, .discoverRecent:
+            let entries = await historyService.recentEntries(limit: 50)
+            return entries.map { $0.toStationDTO() }
+        default:
+            return context.stations
         }
     }
 }

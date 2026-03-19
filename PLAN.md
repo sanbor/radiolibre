@@ -768,6 +768,7 @@ final class DiscoverViewModel: ObservableObject {
 
     func load() async
     // Loads favorites + recents from local storage immediately (no network needed)
+    // Recents are filtered to exclude stations already in favorites (avoids redundancy)
     // Then uses async let for concurrent network fetches:
     //   localCountry = Locale.current.region?.identifier ?? "US"
     //   async let local = service.fetchLocalStations(countrycode: localCountry, limit: 20)
@@ -1279,6 +1280,7 @@ struct LibreRadioApp: App {
 **Implementation notes (Discover — Favorites & Recents sections):**
 - **Duplicate `StationDTO.id` in ForEach:** `HistoryEntry` has a unique `id: UUID`, but `toStationDTO()` produces a `StationDTO` whose `id` is `stationuuid`. If the same station appears multiple times in history (played >30 min apart), the carousel's `ForEach` gets duplicate IDs, causing SwiftUI rendering bugs (missing images, skipped views). Fix: deduplicate by `stationuuid` when converting history entries to `StationDTO` in `DiscoverViewModel.loadLocalData()`. This is a general pitfall whenever converting `HistoryEntry` arrays to `[StationDTO]` for use in `ForEach` — always deduplicate first.
 - **Favorites and recents load from local storage** (no network needed), so they appear immediately before API data arrives. This gives the Discover screen instant content even on slow connections.
+- **Recents exclude favorites:** After building the deduplicated recents list, stations whose `stationuuid` appears in the favorites set are removed. This prevents a station from appearing in both the Favorites and Recently Played carousels. The Recently Played section is already hidden by the view when the list is empty, so no view changes are needed.
 
 **Implementation notes (Build Fix):**
 - **Missing shared scheme:** XcodeGen was not generating a shared `.xcscheme` file because `project.yml` had no `schemes:` section. Without a shared scheme, `xcodebuild -scheme LibreRadio` fails with "Supported platforms for the buildables in the current scheme is empty." Fix: add an explicit `schemes:` block to `project.yml` with build targets and test targets.

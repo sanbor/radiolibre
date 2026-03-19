@@ -138,7 +138,7 @@ final class NowPlayingService {
         center.nextTrackCommand.isEnabled = true
         center.nextTrackCommand.addTarget { [weak self] _ in
             Task { @MainActor in
-                await self?.playerViewModel?.playNextFavorite()
+                await self?.playerViewModel?.playNext()
             }
             return .success
         }
@@ -146,7 +146,7 @@ final class NowPlayingService {
         center.previousTrackCommand.isEnabled = true
         center.previousTrackCommand.addTarget { [weak self] _ in
             Task { @MainActor in
-                await self?.playerViewModel?.playPreviousFavorite()
+                await self?.playerViewModel?.playPrevious()
             }
             return .success
         }

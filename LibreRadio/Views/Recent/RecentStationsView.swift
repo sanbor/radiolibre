@@ -62,7 +62,11 @@ struct RecentStationsView: View {
                     subtitle: entry.playedAt.relativeDescription,
                     isConnecting: isConnecting
                 ) {
-                    playerVM.play(station: station)
+                    let context = PlaybackContext(
+                        source: .recent,
+                        stations: viewModel.entries.map { $0.toStationDTO() }
+                    )
+                    playerVM.play(station: station, context: context)
                 }
             }
         }

@@ -63,14 +63,16 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
 
     private func reloadFavorites() {
         Task { @MainActor in
-            let stations = await FavoritesService.shared.allFavorites()
-            let items = stations.map { fav in
+            let favorites = await FavoritesService.shared.allFavorites()
+            let stationDTOs = favorites.map { $0.toStationDTO() }
+            let items = favorites.enumerated().map { _, fav in
                 makeListItem(
                     name: fav.name,
                     codec: fav.codec,
                     bitrate: fav.bitrate,
                     faviconURLString: fav.faviconURL,
-                    station: fav.toStationDTO()
+                    station: fav.toStationDTO(),
+                    context: PlaybackContext(source: .favorites, stations: stationDTOs)
                 )
             }
             favoritesTemplate.updateSections([CPListSection(items: items)])
@@ -80,13 +82,15 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
     private func reloadRecents() {
         Task { @MainActor in
             let entries = await HistoryService.shared.recentEntries(limit: 20)
+            let stationDTOs = entries.map { $0.toStationDTO() }
             let items = entries.map { entry in
                 makeListItem(
                     name: entry.name,
                     codec: entry.codec,
                     bitrate: entry.bitrate,
                     faviconURLString: entry.faviconURL,
-                    station: entry.toStationDTO()
+                    station: entry.toStationDTO(),
+                    context: PlaybackContext(source: .recent, stations: stationDTOs)
                 )
             }
             recentsTemplate.updateSections([CPListSection(items: items)])
@@ -102,7 +106,8 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
                     codec: dto.codec,
                     bitrate: dto.bitrate.flatMap { $0 > 0 ? $0 : nil },
                     faviconURLString: dto.favicon,
-                    station: dto
+                    station: dto,
+                    context: PlaybackContext(source: .discoverTopClicks, stations: stations)
                 )
             }
             popularTemplate.updateSections([CPListSection(items: items)])
@@ -142,7 +147,8 @@ extension CarPlaySceneDelegate {
         codec: String?,
         bitrate: Int?,
         faviconURLString: String?,
-        station: StationDTO
+        station: StationDTO,
+        context: PlaybackContext
     ) -> CPListItem {
         let placeholder = UIImage(systemName: "radio") ?? UIImage()
 
@@ -170,7 +176,7 @@ extension CarPlaySceneDelegate {
         item.handler = { [weak self] _, completion in
             _ = self // retain reference for clarity
             Task { @MainActor in
-                PlayerViewModel.shared.play(station: station)
+                PlayerViewModel.shared.play(station: station, context: context)
             }
             completion()
         }

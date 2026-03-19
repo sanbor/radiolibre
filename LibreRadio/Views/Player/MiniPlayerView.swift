@@ -5,15 +5,28 @@ struct MiniPlayerView: View {
     @EnvironmentObject private var favoritesVM: FavoritesViewModel
     @State private var showFullPlayer = false
 
+    @GestureState private var dragOffset: CGFloat = 0
+
     var body: some View {
         Group {
             if let station = playerVM.currentStation {
-                Button {
-                    showFullPlayer = true
-                } label: {
+                VStack(spacing: 0) {
+                    dragHandle
                     activeContent(station: station)
                 }
-                .buttonStyle(.plain)
+                .contentShape(Rectangle())
+                .onTapGesture { showFullPlayer = true }
+                .gesture(
+                    DragGesture(minimumDistance: 20)
+                        .updating($dragOffset) { value, state, _ in
+                            state = value.translation.height
+                        }
+                        .onEnded { value in
+                            if value.translation.height < -30 {
+                                showFullPlayer = true
+                            }
+                        }
+                )
                 .sheet(isPresented: $showFullPlayer) {
                     FullPlayerView()
                 }
@@ -22,6 +35,13 @@ struct MiniPlayerView: View {
             }
         }
         .background(.ultraThinMaterial)
+    }
+
+    private var dragHandle: some View {
+        Capsule()
+            .fill(.tertiary)
+            .frame(width: 36, height: 5)
+            .padding(.top, 6)
     }
 
     private func activeContent(station: StationDTO) -> some View {

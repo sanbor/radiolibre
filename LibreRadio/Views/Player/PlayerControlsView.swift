@@ -2,19 +2,18 @@ import SwiftUI
 
 struct PlayerControlsView: View {
     @EnvironmentObject private var playerVM: PlayerViewModel
-    @EnvironmentObject private var favoritesVM: FavoritesViewModel
 
     var body: some View {
         VStack(spacing: 24) {
             // Transport controls
             HStack(spacing: 40) {
                 Button {
-                    Task { await playerVM.playPreviousFavorite() }
+                    Task { await playerVM.playPrevious() }
                 } label: {
                     Image(systemName: "backward.fill")
                         .font(.title2)
                 }
-                .disabled(favoritesVM.favorites.isEmpty)
+                .disabled(!playerVM.canSkipTrack)
                 .accessibilityLabel("Previous Station")
 
                 Button {
@@ -34,12 +33,12 @@ struct PlayerControlsView: View {
                 .accessibilityLabel(playerVM.isPlaying ? "Pause" : "Play")
 
                 Button {
-                    Task { await playerVM.playNextFavorite() }
+                    Task { await playerVM.playNext() }
                 } label: {
                     Image(systemName: "forward.fill")
                         .font(.title2)
                 }
-                .disabled(favoritesVM.favorites.isEmpty)
+                .disabled(!playerVM.canSkipTrack)
                 .accessibilityLabel("Next Station")
             }
             .foregroundStyle(.primary)

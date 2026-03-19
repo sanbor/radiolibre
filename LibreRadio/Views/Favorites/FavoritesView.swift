@@ -47,7 +47,11 @@ struct FavoritesView: View {
                 let isConnecting = playerVM.isLoading
                     && playerVM.currentStation?.stationuuid == favorite.stationuuid
                 StationRowView(station: station, isConnecting: isConnecting) {
-                    playerVM.play(station: station)
+                    let context = PlaybackContext(
+                        source: .favorites,
+                        stations: favoritesVM.favorites.map { $0.toStationDTO() }
+                    )
+                    playerVM.play(station: station, context: context)
                 }
             }
             .onDelete { offsets in

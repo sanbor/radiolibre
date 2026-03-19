@@ -101,7 +101,7 @@ Shows curated station sections at a glance.
 | Section | Source | Limit | Layout | Condition |
 |---|---|---|---|---|
 | Favorites | User's favorited stations (local) | All | Horizontal carousel | Only if favorites exist |
-| Recently Played | User's play history (local) | 10 | Horizontal carousel | Only if history exists |
+| Recently Played | User's play history (local), excluding favorites | 10 | Horizontal carousel | Only if non-favorite history exists |
 | Local Stations | User's country (auto-detected from locale, default "US") | 20 | Horizontal carousel | — |
 | Top Stations | Most clicked in last 24h | 20 | Horizontal carousel | — |
 | Most Voted | Most voted all time | 20 | Horizontal carousel | — |
