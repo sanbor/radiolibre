@@ -43,7 +43,10 @@ struct StationDTO: Codable, Identifiable, Hashable, Sendable {
 
     var faviconURL: URL? {
         guard let favicon, !favicon.isEmpty else { return nil }
-        return URL(string: favicon)
+        let secured = favicon.hasPrefix("http://")
+            ? "https://" + favicon.dropFirst(7)
+            : favicon
+        return URL(string: secured)
     }
 
     var homepageURL: URL? {

@@ -95,7 +95,7 @@ Best practice: randomize server list, pick first, rotate on failure. Cache in Us
 | `url` | URL string | User-submitted stream URL |
 | `url_resolved` | URL string | Auto-resolved direct stream URL (prefer this) |
 | `homepage` | URL string | Station website |
-| `favicon` | URL string | Station icon URL |
+| `favicon` | URL string | Station icon URL (may be `http://`; upgrade to `https://` to satisfy ATS) |
 | `tags` | string | Comma-separated genre tags |
 | `countrycode` | string | ISO 3166-1 alpha-2 (e.g. "US") |
 | `country` | string | Country name (deprecated, use countrycode) |
