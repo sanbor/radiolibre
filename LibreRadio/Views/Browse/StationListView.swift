@@ -42,7 +42,7 @@ struct StationListView: View {
 
     private var emptyView: some View {
         VStack(spacing: 16) {
-            Image(systemName: "radio")
+            Image(systemName: "antenna.radiowaves.left.and.right")
                 .font(.system(size: 48))
                 .foregroundStyle(.secondary)
             Text("No stations found")

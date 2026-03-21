@@ -62,8 +62,10 @@ struct PlayerControlsView: View {
             }
             .padding(.horizontal)
 
-            AirPlayButton()
-                .frame(width: 36, height: 36)
+            if playerVM.audioService.hasExternalRoutes {
+                AirPlayButton()
+                    .frame(width: 36, height: 36)
+            }
         }
     }
 }

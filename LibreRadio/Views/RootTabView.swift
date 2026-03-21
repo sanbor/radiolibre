@@ -35,7 +35,7 @@ struct RootTabView: View {
             FavoritesView()
                 .safeAreaInset(edge: .bottom, spacing: 0) { miniPlayerSpacer }
                 .tabItem {
-                    Label("Favorites", systemImage: "heart.fill")
+                    Label("Favorites", systemImage: "star.fill")
                 }
         }
         .overlay(alignment: .bottom) {
@@ -62,15 +62,33 @@ struct RootTabView: View {
     }
 
     private var miniPlayerBar: some View {
-        MiniPlayerView(station: playerVM.currentStation)
-            .background(.ultraThinMaterial)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                if playerVM.currentStation != nil {
-                    showFullPlayer = true
+        MiniPlayerView(station: playerVM.currentStation, onTapInfo: {
+                showFullPlayer = true
+            })
+            .background {
+                ZStack {
+                    RoundedRectangle(cornerRadius: LayoutConstants.miniPlayerCornerRadius, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                    // Specular highlight — frosted glass top edge
+                    RoundedRectangle(cornerRadius: LayoutConstants.miniPlayerCornerRadius, style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: [.white.opacity(0.18), .white.opacity(0.05), .clear],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
                 }
             }
-            .padding(.bottom, LayoutConstants.tabBarHeight)
+            .clipShape(RoundedRectangle(cornerRadius: LayoutConstants.miniPlayerCornerRadius, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: LayoutConstants.miniPlayerCornerRadius, style: .continuous)
+                    .strokeBorder(.white.opacity(0.2), lineWidth: 0.5)
+            )
+            .shadow(color: .black.opacity(0.08), radius: 3, y: 1)
+            .shadow(color: .black.opacity(0.15), radius: LayoutConstants.miniPlayerShadowRadius, y: LayoutConstants.miniPlayerShadowY)
+            .padding(.horizontal, LayoutConstants.miniPlayerHorizontalMargin)
+            .padding(.bottom, LayoutConstants.tabBarHeight + LayoutConstants.miniPlayerBottomGap)
     }
 
     private var miniPlayerSpacer: some View {

@@ -138,7 +138,7 @@ struct RadioLiveActivityWidget: Widget {
                 .aspectRatio(contentMode: .fill)
                 .frame(width: size, height: size)
         } else {
-            Image(systemName: "radio")
+            Image(systemName: "antenna.radiowaves.left.and.right")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: size, height: size)

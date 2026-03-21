@@ -146,7 +146,7 @@ extension CarPlaySceneDelegate {
         station: StationDTO,
         context: PlaybackContext
     ) -> CPListItem {
-        let placeholder = UIImage(systemName: "radio") ?? UIImage()
+        let placeholder = UIImage(systemName: "antenna.radiowaves.left.and.right") ?? UIImage()
 
         var syncImage: UIImage?
         if let url = station.faviconURL {

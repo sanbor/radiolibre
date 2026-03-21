@@ -1,4 +1,5 @@
 import AVFoundation
+import AVKit
 import Foundation
 
 @MainActor
@@ -13,6 +14,7 @@ final class AudioPlayerService: ObservableObject {
     @Published var volume: Float = 1.0 {
         didSet { player.volume = volume }
     }
+    @Published private(set) var hasExternalRoutes: Bool = false
 
     enum PlaybackState: Equatable {
         case idle
@@ -81,6 +83,8 @@ final class AudioPlayerService: ObservableObject {
     private let nowPlayingService: NowPlayingService
     private var currentBufferDuration: TimeInterval = initialBufferDuration
     private var stallCount: Int = 0
+    private let routeDetector = AVRouteDetector()
+    private var routeDetectorObservation: NSKeyValueObservation?
 
     // MARK: - Init
 
@@ -97,6 +101,7 @@ final class AudioPlayerService: ObservableObject {
         setupInterruptionObserver()
         setupRouteChangeObserver()
         observeTimeControlStatus()
+        setupRouteDetector()
     }
 
     // MARK: - Public API
@@ -248,6 +253,16 @@ final class AudioPlayerService: ObservableObject {
     }
 
     // MARK: - Route Change Handling
+
+    private func setupRouteDetector() {
+        routeDetector.isRouteDetectionEnabled = true
+        hasExternalRoutes = routeDetector.multipleRoutesDetected
+        routeDetectorObservation = routeDetector.observe(\.multipleRoutesDetected, options: [.new]) { [weak self] _, change in
+            Task { @MainActor [weak self] in
+                self?.hasExternalRoutes = change.newValue ?? false
+            }
+        }
+    }
 
     private func setupRouteChangeObserver() {
         NotificationCenter.default.addObserver(

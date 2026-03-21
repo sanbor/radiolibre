@@ -109,11 +109,11 @@ struct FullPlayerView: View {
                     Label(
                         favoritesVM.isFavorite(stationuuid: station.stationuuid) ? "Unfavorite" : "Favorite",
                         systemImage: favoritesVM.isFavorite(stationuuid: station.stationuuid)
-                            ? "heart.fill" : "heart"
+                            ? "star.fill" : "star"
                     )
                     .font(.subheadline)
                 }
-                .tint(.pink)
+                .tint(.orange)
                 .accessibilityLabel(
                     favoritesVM.isFavorite(stationuuid: station.stationuuid) ? "Remove from Favorites" : "Add to Favorites"
                 )
@@ -175,7 +175,7 @@ struct FullPlayerView: View {
 
             // Radio Browser link
             Link(destination: URL(string: "https://www.radio-browser.info/history/\(station.stationuuid)")!) {
-                Label("Radio Browser", systemImage: "radio")
+                Label("Radio Browser", systemImage: "antenna.radiowaves.left.and.right")
                     .font(.subheadline)
             }
 

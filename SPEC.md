@@ -93,9 +93,9 @@ Rules:
 | Recent | clock | Recently played stations |
 | Search | magnifyingglass | Search with filters |
 | Browse | list.bullet | Countries / Languages / Tags |
-| Favorites | heart.fill | Saved stations |
+| Favorites | star.fill | Saved stations |
 
-A mini player bar sits above the tab bar whenever a station is loaded.
+A mini player bar sits above the tab bar. Always visible with an idle state when no station is loaded.
 
 ---
 
@@ -213,8 +213,8 @@ User-saved stations, persisted locally.
 ### Integration Points
 
 Favorites are accessible everywhere:
-- Station rows: leading swipe toggles favorite (heart icon, filled when favorited)
-- Full player: favorite button
+- Station rows: leading swipe toggles favorite (star icon, filled when favorited)
+- Full player: favorite button (star icon, orange)
 - Context menu: "Add to Favorites" / "Remove from Favorites"
 
 ---
@@ -305,15 +305,15 @@ Allows HTTP (non-HTTPS) for media streams only via `NSAllowsArbitraryLoadsForMed
 The Live Activity provides an enhanced lock screen experience. `MPNowPlayingInfoCenter.nowPlayingInfo` is also set by `updateNowPlaying()` with station name, artist metadata (country code + subdivision + codec + bitrate), live stream flag, playback rate, and favicon artwork. Live Activity takes visual priority on the lock screen; `nowPlayingInfo` provides CarPlay Now Playing tab metadata and the standard Control Center widget.
 
 **Lock screen banner** shows:
-- Station favicon (40×40 rounded rect, placeholder radio icon if unavailable)
+- Station favicon (40×40 rounded rect, placeholder `antenna.radiowaves.left.and.right` icon if unavailable)
 - Flag emoji + station name (headline)
 - Country code + subdivision, codec, bitrate (secondary metadata, no flag emoji — emojis render as gray rectangles on the lock screen)
 - Play/pause and stop buttons (iOS 17+ via `LiveActivityIntent`; static state icon on iOS 16.2)
 
 **Dynamic Island** shows:
 - Expanded: station favicon + name (leading), playback controls (trailing), country code + subdivision + codec + bitrate (bottom, no flag emoji)
-- Compact: radio icon (leading), state icon (trailing)
-- Minimal: radio icon
+- Compact: antenna icon (leading), state icon (trailing)
+- Minimal: antenna icon
 
 **Lifecycle:**
 - Started on play, updated on state changes
@@ -346,9 +346,26 @@ Remote commands still work via `MPRemoteCommandCenter` (command routing is based
 
 ### Mini Player
 
-Persistent bar above the tab bar. Always visible; shows idle state when no station is loaded.
+Translucent floating island above the tab bar. Always visible; shows idle state ("No station playing" with antenna icon) when no station is loaded. Width is 80% of the viewport, centered.
 
-Shows: favicon (40×40), station name, codec + bitrate, play/pause button, stop button. Spinner replaces play/pause button when buffering. Subtitle shows "Connecting..." when loading, error message (in red) on error, codec + bitrate otherwise. Translucent background.
+**Visual treatment:** `.regularMaterial` background, 18pt continuous corner radius, frosted glass stroke border (0.5pt white @ 15% opacity), dual shadows (contact: 3pt/1pt, ambient: 12pt/4pt).
+
+**Active layout** (info-left, controls-right):
+
+| Width | Layout |
+|---|---|
+| Narrow (< 500pt, e.g. iPhone portrait) | `[star] [favicon + name/subtitle] [play/pause]` |
+| Wide (≥ 500pt, e.g. iPhone landscape, iPad, Mac) | `[star] [favicon + name/subtitle] [prev] [play/pause] [next] [more] [volume] [AirPlay]` |
+
+Buttons:
+- **Favorite star** (orange, leading) — toggles favorite
+- **Previous / Next** — skip through playback context (wide only)
+- **Play/Pause** — spinner when buffering
+- **More menu** (`...`) — Vote, Copy Stream URL, Share, Visit Website, Stop (wide only)
+- **Volume menu** — preset levels: Mute, 25%, 50%, 75%, 100% (wide only)
+- **AirPlay** — system route picker (wide only)
+
+All buttons have 44×44pt tap targets. Subtitle shows "Connecting..." when loading, "Buffering..." during stalls, error message (red) on error, artist/track info or codec + bitrate otherwise.
 
 Tapping anywhere (except buttons) opens the full player.
 
@@ -362,7 +379,7 @@ Shows:
 - Previous / play-pause / next buttons
 - Volume slider
 - AirPlay button (system route picker)
-- Favorite toggle (heart icon)
+- Favorite toggle (star icon, orange)
 - Vote button
 - Tag chips
 - Station metadata: codec, bitrate, last check status + time
@@ -410,7 +427,7 @@ Memory tier auto-evicts under system memory pressure. Disk tier lives in the sys
 
 ### Favicon View
 
-Reusable image view: takes an optional URL and a size. Shows a radio icon placeholder while loading or on failure. Clips to rounded rectangle (corner radius = 20% of size). Reloads when URL changes.
+Reusable image view: takes an optional URL and a size. Shows an `antenna.radiowaves.left.and.right` icon placeholder while loading or on failure. Clips to rounded rectangle (corner radius = 20% of size). Reloads when URL changes.
 
 ---
 
@@ -432,7 +449,7 @@ Browse and play stations from the car's display via `CPTemplateApplicationSceneD
 Each station list item shows:
 - **Text:** station name
 - **Detail text:** codec (uppercased) + bitrate (e.g. "MP3 128k"), omitting either part if unavailable
-- **Image:** favicon from memory cache (sync), with async load + update; SF Symbol `radio` as placeholder
+- **Image:** favicon from memory cache (sync), with async load + update; SF Symbol `antenna.radiowaves.left.and.right` as placeholder
 
 ### Playback
 

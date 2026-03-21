@@ -111,7 +111,7 @@ struct StationRowView: View {
             } label: {
                 Label(
                     favoritesVM.isFavorite(stationuuid: station.stationuuid) ? "Remove Favorite" : "Add to Favorites",
-                    systemImage: favoritesVM.isFavorite(stationuuid: station.stationuuid) ? "heart.slash" : "heart"
+                    systemImage: favoritesVM.isFavorite(stationuuid: station.stationuuid) ? "star.slash" : "star"
                 )
             }
 
@@ -163,9 +163,9 @@ struct StationRowView: View {
                 }
             } label: {
                 Image(systemName: favoritesVM.isFavorite(stationuuid: station.stationuuid)
-                    ? "heart.slash.fill" : "heart.fill")
+                    ? "star.slash.fill" : "star.fill")
             }
-            .tint(.pink)
+            .tint(.orange)
         }
     }
 }

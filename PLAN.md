@@ -922,7 +922,7 @@ TabView {
     HomeView()           // .tabItem { Label("Home", systemImage: "house.fill") }
     SearchView()         // .tabItem { Label("Search", systemImage: "magnifyingglass") }
     BrowseView()         // .tabItem { Label("Browse", systemImage: "list.bullet") }
-    FavoritesView()      // .tabItem { Label("Favorites", systemImage: "heart.fill") }
+    FavoritesView()      // .tabItem { Label("Favorites", systemImage: "star.fill") }
     HistoryView()        // .tabItem { Label("History", systemImage: "clock") }
 }
 .safeAreaInset(edge: .bottom) {
@@ -988,23 +988,27 @@ Search bar for filtering the country list locally.
 - Left side: name, subtitle (tags by default, or custom text via `subtitle` param), location (flag emoji + country code + state/subdivision via `locationLabel`, e.g. "🇦🇷 AR Buenos Aires")
 - Right side: codec badge + bitrate label
 - Optional `subtitle: String?` parameter: when set, displays instead of tags (used by Recent tab for relative timestamps like "2 hr. ago")
-- Swipe actions: leading = toggle favorite (heart icon)
+- Swipe actions: leading = toggle favorite (star icon, orange)
 - Context menu: Play, Add to Favorites, Vote, Copy Stream URL, Share, Visit Website
 - Tapping plays the station
 
 #### `MiniPlayerView.swift`
 
-Persistent bottom bar above tab bar (via `safeAreaInset`):
+Translucent floating island above tab bar (via overlay + `safeAreaInset` spacer). Always visible with idle state when nothing is playing. Width = 80% of viewport.
+
+**Visual:** `.regularMaterial`, 18pt corner radius, frosted glass stroke, dual shadows. Width-adaptive layout (threshold: 500pt bar width, not `horizontalSizeClass` which stays `.compact` on iPhone landscape).
 
 ```
-┌──────────────────────────────────────────────────┐
-│ [icon] Station Name          [⏸] [⏹]            │
-│  40x40  MP3 · 128kbps                           │
-└──────────────────────────────────────────────────┘
+Wide (≥500pt):  [★] [icon] Station Name / subtitle  [⏮] [⏸] [⏭] [...] [🔊] [AirPlay]
+Narrow (<500pt): [★] [icon] Station Name / subtitle  [⏸]
 ```
 
 - Tap anywhere (except buttons) → present `FullPlayerView` as sheet
 - Shows loading spinner when buffering
+- More menu (...): Vote, Copy Stream URL, Share, Visit Website, Stop
+- Volume menu: preset levels (Mute/25%/50%/75%/100%) — popover doesn't work on iPhone (becomes full-screen sheet)
+- All buttons have 44×44pt tap targets for accessibility
+- Favorite star uses `.callout` font with 28×44pt frame (compact visual, full tap target)
 
 #### `FullPlayerView.swift`
 
@@ -1067,7 +1071,7 @@ struct FaviconImageView: View {
             if let image {
                 Image(uiImage: image).resizable().aspectRatio(contentMode: .fill)
             } else {
-                Image(systemName: "radio").resizable().foregroundStyle(.secondary)
+                Image(systemName: "antenna.radiowaves.left.and.right").resizable().foregroundStyle(.secondary)
             }
         }
         .frame(width: size, height: size)
@@ -1256,7 +1260,7 @@ struct LibreRadioApp: App {
 - **StationListView init with `@StateObject`:** The `StationListView` receives a `Filter` enum and creates its `StationListViewModel` via `StateObject(wrappedValue:)` in the init. The `title` parameter in `init` is unused directly since the VM derives its own title — the `StationListView` uses `viewModel.title` for the navigation title.
 - **Offset rollback on loadMore error:** When `loadMore()` fails, the offset is decremented back so the user can retry loading the same page. Without this, the offset would advance past data that was never loaded.
 - **Test scheme name:** The Xcode project has a single scheme `LibreRadio` (not `LibreRadioTests`). Tests must be run via `xcodebuild -scheme LibreRadio test`, not `-scheme LibreRadioTests`.
-- **Favorites tab placeholder:** Added as a simple NavigationStack with "No favorites yet" text and heart icon, ready for Phase 4 to replace with real FavoritesView.
+- **Favorites tab placeholder:** Added as a simple NavigationStack with "No favorites yet" text and star icon, ready for Phase 4 to replace with real FavoritesView.
 - **StationListView sort options (post-MVP):** Added `StationSortOrder` enum (`.byClicks`/`.byName`) with API parameter mapping. `StationListViewModel` passes sort params to `fetchStationsByCountry`/`fetchStationsByLanguage`/`fetchStationsByTag`. Sorting is server-side via the Radio Browser `order` parameter — client-side sort would only sort the loaded page. When sorted by name, stations are sectioned by first letter with `AlphabetIndexView` on the trailing edge, following the same pattern as `CountryListView`. `reloadForCurrentSort()` resets `isLoading = false` before calling `load()` to prevent a guard deadlock when the user toggles sort while a previous fetch is in-flight.
 
 ### Phase 4: Persistence
@@ -1270,7 +1274,7 @@ struct LibreRadioApp: App {
 6. ~~`HistoryViewModel.swift`~~ → **Done (pre-Phase 4):** `RecentStationsViewModel.swift`
 7. ~~`HistoryView.swift`~~ → **Done (pre-Phase 4):** `RecentStationsView.swift` with relative timestamps, clear all
 8. Add swipe-to-favorite on `StationRowView`
-9. Add favorite heart button to `FullPlayerView`
+9. Add favorite star button to `FullPlayerView`
 10. ~~Record history entries in `PlayerViewModel.play()`~~ → **Done (pre-Phase 4)**
 11. Auto-vote on favorite (RadioDroid behavior)
 

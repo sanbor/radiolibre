@@ -13,7 +13,7 @@ struct FaviconImageView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fill)
             } else {
-                Image(systemName: "radio")
+                Image(systemName: "antenna.radiowaves.left.and.right")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .foregroundStyle(.secondary)

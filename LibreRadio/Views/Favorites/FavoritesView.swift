@@ -30,7 +30,7 @@ struct FavoritesView: View {
 
     private var emptyState: some View {
         VStack(spacing: 12) {
-            Image(systemName: "heart")
+            Image(systemName: "star")
                 .font(.system(size: 48))
                 .foregroundStyle(.secondary)
             Text("No favorites yet")
