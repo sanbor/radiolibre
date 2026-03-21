@@ -5,7 +5,7 @@ argument-hint: <feature-or-area>
 
 You are implementing a feature for the LibreRadio iOS app. The user has requested: **$ARGUMENTS**
 
-Follow these 9 steps in order. Do not skip steps.
+Follow these 12 steps in order. Do not skip steps.
 
 ---
 
@@ -145,3 +145,53 @@ Update `SPEC.md` and `PLAN.md` with any decisions and edge cases discovered duri
    The goal is to make PLAN.md a living document that gets smarter with each implementation pass. Future runs of `/implement` read these notes and avoid repeating the same mistakes.
 
 **Do not** rewrite existing content that is still accurate — only add new information or correct details that turned out to be wrong. Keep additions concise and factual.
+
+---
+
+## Step 10: Code Review
+
+Review the full changeset as a cohesive unit — not file-by-file as in Step 8, but as a complete diff representing what would be merged. Use `git diff` to see every line changed, then evaluate:
+
+1. **Correctness** — Does the change as a whole do what was requested? Are there logical gaps between files (e.g., a service method added but never called, a model field decoded but never displayed)?
+2. **Consistency** — Do naming conventions, error handling patterns, and architectural boundaries remain consistent across the entire change? No file should introduce a pattern that contradicts another file in the same changeset.
+3. **Completeness** — Is anything half-done? Check for TODO/FIXME comments you left, placeholder values, empty implementations, or test stubs that don't assert anything meaningful.
+4. **Regression risk** — Could any of these changes break existing functionality? Look for modified shared types, changed function signatures, or altered service behavior that other parts of the app depend on.
+5. **Test quality** — Do the tests actually validate the behavior, or do they just exercise code paths without meaningful assertions? Are failure modes tested, not just happy paths?
+
+**Fix every issue you find.** After fixing, re-run the full test suite to confirm nothing broke. If you made changes, do another pass of this review until the diff is clean.
+
+---
+
+## Step 11: Update Changelog
+
+Append a new entry to `CHANGELOG.md` in the project root. **This file is append-only** — never modify or remove existing entries.
+
+If `CHANGELOG.md` does not exist yet, create it with a `# Changelog` header before adding the first entry.
+
+Each entry should follow this format:
+
+```markdown
+## YYYY-MM-DD — Brief title of the change
+
+**Prompt:** `/implement $ARGUMENTS`
+
+**Changes:**
+- Bullet list summarizing what was built, modified, or fixed
+- Include files created, features added, and notable decisions
+```
+
+Use today's date and the exact `$ARGUMENTS` the user provided. The changes summary should be concise but complete enough that someone reading the changelog can understand what was delivered without reading the code.
+
+---
+
+## Step 12: Final Consistency Check
+
+Re-read `SPEC.md`, `PLAN.md`, and `CHANGELOG.md` in full. Verify they are mutually consistent and accurately reflect the current implementation:
+
+1. **SPEC.md vs code** — Every behavior described in SPEC.md should match what the code actually does. If the implementation revealed that a spec detail was wrong, incomplete, or needed adjustment, the spec should already reflect that (from Step 9). Catch anything missed.
+2. **PLAN.md vs code** — The architecture, file structure, and patterns described in PLAN.md should match reality. Phase statuses should be up to date. No plan section should describe components that were removed, renamed, or never built.
+3. **CHANGELOG.md vs code** — The changelog entry from Step 11 should accurately describe what was actually delivered. Cross-check against `git diff` — if you fixed bugs or added features during review steps that aren't mentioned, update the entry.
+4. **SPEC.md vs PLAN.md** — The two documents should not contradict each other. If SPEC.md defines a behavior, PLAN.md should describe how it's architecturally supported (and vice versa). Resolve any drift.
+5. **CHANGELOG.md vs SPEC.md/PLAN.md** — The changelog should not claim features that aren't documented in the spec, and shouldn't omit features that are.
+
+**Fix any inconsistencies you find.** Keep corrections minimal and factual — do not rewrite sections that are already accurate.
