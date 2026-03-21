@@ -27,7 +27,10 @@ actor ServerDiscoveryService {
             return URL(string: "https://de1.api.radio-browser.info")!
         }
         let host = servers[currentIndex % servers.count]
-        return URL(string: "https://\(host)")!
+        guard let url = URL(string: "https://\(host)") else {
+            return URL(string: "https://de1.api.radio-browser.info")!
+        }
+        return url
     }
 
     func resolveIfNeeded() async {

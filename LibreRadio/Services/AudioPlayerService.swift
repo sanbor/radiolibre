@@ -207,7 +207,7 @@ final class AudioPlayerService: ObservableObject {
     private func setupAudioSession() {
         do {
             let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, options: [.allowAirPlay, .allowBluetoothA2DP])
+            try session.setCategory(.playback, options: [.allowAirPlay, .allowBluetoothHFP, .allowBluetoothA2DP])
             try session.setActive(true)
         } catch {
             // Audio session errors will surface when playback is attempted

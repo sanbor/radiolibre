@@ -23,6 +23,20 @@ struct StationListView: View {
             }
         }
         .navigationTitle(viewModel.title)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Picker("Sort", selection: $viewModel.sortOrder) {
+                    ForEach(StationSortOrder.allCases, id: \.self) { order in
+                        Text(order.label).tag(order)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .frame(width: 160)
+            }
+        }
+        .onChange(of: viewModel.sortOrder) { _ in
+            Task { await viewModel.reloadForCurrentSort() }
+        }
         .task { await viewModel.load() }
     }
 
@@ -39,37 +53,92 @@ struct StationListView: View {
     }
 
     private var stationList: some View {
-        List {
-            ForEach(viewModel.stations) { station in
-                let isConnecting = playerVM.isLoading && playerVM.currentStation?.stationuuid == station.stationuuid
-                StationRowView(station: station, isConnecting: isConnecting) {
-                    let context = PlaybackContext(
-                        source: .browse(title: viewModel.title),
-                        stations: viewModel.stations
-                    )
-                    playerVM.play(station: station, context: context)
+        Group {
+            if viewModel.sortOrder == .byName {
+                alphabeticalList
+            } else {
+                flatList
+            }
+        }
+    }
+
+    private var alphabeticalList: some View {
+        let sections = viewModel.sectionedStations
+        let letters = sections.map(\.letter)
+
+        return ScrollViewReader { proxy in
+            List {
+                ForEach(sections, id: \.letter) { section in
+                    Section {
+                        ForEach(section.stations) { station in
+                            stationRow(station)
+                        }
+                    } header: {
+                        Text(section.letter)
+                    }
+                    .id(section.letter)
                 }
-                .onAppear {
-                    if station.id == viewModel.stations.last?.id {
-                        Task { await viewModel.loadMore() }
+
+                if viewModel.isLoadingMore {
+                    loadingMoreRow
+                }
+
+                Color.clear
+                    .frame(height: LayoutConstants.listBottomPadding)
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+            }
+            .listStyle(.plain)
+            .safeAreaInset(edge: .trailing, spacing: 0) {
+                AlphabetIndexView(letters: letters) { letter in
+                    withAnimation {
+                        proxy.scrollTo(letter, anchor: .top)
                     }
                 }
             }
+        }
+    }
+
+    private var flatList: some View {
+        List {
+            ForEach(viewModel.stations) { station in
+                stationRow(station)
+            }
 
             if viewModel.isLoadingMore {
-                HStack {
-                    Spacer()
-                    ProgressView()
-                    Spacer()
-                }
-                .listRowSeparator(.hidden)
+                loadingMoreRow
             }
 
             Color.clear
-                .frame(height: 20)
+                .frame(height: LayoutConstants.listBottomPadding)
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
+    }
+
+    private func stationRow(_ station: StationDTO) -> some View {
+        let isConnecting = playerVM.isLoading && playerVM.currentStation?.stationuuid == station.stationuuid
+        return StationRowView(station: station, isConnecting: isConnecting) {
+            let context = PlaybackContext(
+                source: .browse(title: viewModel.title),
+                stations: viewModel.stations
+            )
+            playerVM.play(station: station, context: context)
+        }
+        .onAppear {
+            if station.id == viewModel.stations.last?.id {
+                Task { await viewModel.loadMore() }
+            }
+        }
+    }
+
+    private var loadingMoreRow: some View {
+        HStack {
+            Spacer()
+            ProgressView()
+            Spacer()
+        }
+        .listRowSeparator(.hidden)
     }
 }

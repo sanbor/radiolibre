@@ -84,6 +84,11 @@ struct SearchView: View {
                 }
                 .listRowSeparator(.hidden)
             }
+
+            Color.clear
+                .frame(height: LayoutConstants.listBottomPadding)
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
     }

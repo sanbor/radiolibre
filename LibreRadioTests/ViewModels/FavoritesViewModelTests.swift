@@ -34,7 +34,6 @@ final class FavoritesViewModelTests: XCTestCase {
         XCTAssertTrue(vm.favorites.isEmpty)
         XCTAssertFalse(vm.isLoading)
         XCTAssertFalse(vm.isSyncing)
-        XCTAssertNil(vm.error)
     }
 
     // MARK: - Load

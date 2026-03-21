@@ -16,7 +16,7 @@ struct AlphabetIndexView: View {
             }
         }
         .padding(.vertical, 4)
-        .padding(.horizontal, 6)
+        .padding(.leading, 12).padding(.trailing, 6)
         .contentShape(Rectangle())
         .gesture(
             DragGesture(minimumDistance: 0, coordinateSpace: .local)

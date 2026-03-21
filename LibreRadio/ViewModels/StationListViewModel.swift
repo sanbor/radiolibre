@@ -16,6 +16,7 @@ final class StationListViewModel: ObservableObject {
     @Published var isLoadingMore = false
     @Published var error: AppError?
     @Published var hasMore = true
+    @Published var sortOrder: StationSortOrder = .byClicks
 
     private var currentOffset = 0
     private let pageSize = 100
@@ -78,14 +79,34 @@ final class StationListViewModel: ObservableObject {
         isLoadingMore = false
     }
 
+    func reloadForCurrentSort() async {
+        isLoading = false
+        stations = []
+        hasMore = true
+        currentOffset = 0
+        error = nil
+        await load()
+    }
+
+    var sectionedStations: [(letter: String, stations: [StationDTO])] {
+        let grouped = Dictionary(grouping: stations) { station in
+            let first = station.name.trimmingCharacters(in: .whitespaces).prefix(1)
+            return first.isEmpty ? "#" : String(first).uppercased()
+        }
+        return grouped.sorted { $0.key < $1.key }
+            .map { (letter: $0.key, stations: $0.value) }
+    }
+
     private func fetchStations(offset: Int) async throws -> [StationDTO] {
+        let order = sortOrder.apiOrderParam
+        let reverse = sortOrder.apiReverse
         switch filter {
         case .country(let code):
-            return try await service.fetchStationsByCountry(code, limit: pageSize, offset: offset)
+            return try await service.fetchStationsByCountry(code, order: order, reverse: reverse, limit: pageSize, offset: offset)
         case .language(let name):
-            return try await service.fetchStationsByLanguage(name, limit: pageSize, offset: offset)
+            return try await service.fetchStationsByLanguage(name, order: order, reverse: reverse, limit: pageSize, offset: offset)
         case .tag(let name):
-            return try await service.fetchStationsByTag(name, limit: pageSize, offset: offset)
+            return try await service.fetchStationsByTag(name, order: order, reverse: reverse, limit: pageSize, offset: offset)
         }
     }
 }

@@ -26,7 +26,9 @@ final class PlayerViewModel: ObservableObject {
         self.historyService = historyService
         self.favoritesService = favoritesService
 
-        // Forward audioService state changes to trigger objectWillChange
+        // Forward audioService state changes to trigger objectWillChange.
+        // Uses Combine because ObservableObject.objectWillChange is a Combine publisher
+        // and there's no pure-Swift-concurrency alternative on iOS 16 (pre-@Observable).
         cancellable = audioService.objectWillChange.sink { [weak self] _ in
             self?.objectWillChange.send()
         }

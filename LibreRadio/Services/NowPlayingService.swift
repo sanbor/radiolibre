@@ -7,7 +7,7 @@ final class NowPlayingService {
 
     private weak var audioService: AudioPlayerService?
     weak var playerViewModel: PlayerViewModel?
-    private var favoritesViewModel: FavoritesViewModel?
+    private weak var favoritesViewModel: FavoritesViewModel?
     private var currentStationId: String?
 
     init() {
@@ -86,9 +86,7 @@ final class NowPlayingService {
     private func buildArtistString(for station: StationDTO) -> String {
         var parts: [String] = []
 
-        if let flag = station.flagEmoji, let country = station.countryDisplayName {
-            parts.append("\(flag) \(country)")
-        } else if let country = station.countryDisplayName {
+        if let country = station.countryDisplayName {
             parts.append(country)
         }
 

@@ -3,15 +3,15 @@ import SwiftUI
 struct FullPlayerView: View {
     @EnvironmentObject private var playerVM: PlayerViewModel
     @EnvironmentObject private var favoritesVM: FavoritesViewModel
-    @Environment(\.dismiss) private var dismiss
 
     @State private var voteMessage: String?
+
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
-                    // Drag handle
                     Capsule()
                         .fill(Color(.systemGray4))
                         .frame(width: 36, height: 5)

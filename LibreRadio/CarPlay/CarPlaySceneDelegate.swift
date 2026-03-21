@@ -81,7 +81,7 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
 
     private func reloadRecents() {
         Task { @MainActor in
-            let entries = await HistoryService.shared.recentEntries(limit: 20)
+            let entries = await HistoryService.shared.recentEntries(limit: 20).deduplicatedByFrequency()
             let stationDTOs = entries.map { $0.toStationDTO() }
             let items = entries.map { entry in
                 makeListItem(

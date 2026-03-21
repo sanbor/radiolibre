@@ -52,10 +52,10 @@ final class NowPlayingServiceTests: XCTestCase {
         let info = MPNowPlayingInfoCenter.default().nowPlayingInfo
         let artist = info?[MPMediaItemPropertyArtist] as? String
         XCTAssertNotNil(artist)
-        // Should contain flag, country, codec, and bitrate
-        XCTAssertTrue(artist?.contains("Netherlands") == true)
-        XCTAssertTrue(artist?.contains("AAC+") == true)
-        XCTAssertTrue(artist?.contains("95k") == true)
+        // Should contain country, codec, and bitrate but no flag emoji
+        // (flag emojis render as gray rectangles in MPNowPlayingInfoCenter)
+        XCTAssertEqual(artist, "Netherlands · AAC+ 95k")
+        XCTAssertFalse(artist?.contains("🇳🇱") == true)
     }
 
     func testUpdateNowPlayingMetadataFormatNoCountry() {
@@ -155,5 +155,19 @@ final class NowPlayingServiceTests: XCTestCase {
         service.setPlayerViewModel(playerVM!)
         playerVM = nil
         XCTAssertNil(service.playerViewModel)
+    }
+
+    // MARK: - Favorites ViewModel Wiring
+
+    func testFavoritesViewModelIsWeak() {
+        var favoritesVM: FavoritesViewModel? = FavoritesViewModel()
+        service.setFavoritesViewModel(favoritesVM!)
+        favoritesVM = nil
+        // favoritesViewModel is private, so verify indirectly:
+        // updateLikeCommandState should not crash and like should be inactive
+        let station = StationDTOTests.makeStation(uuid: "test-station", name: "Test")
+        service.updateNowPlaying(station: station, isPlaying: true)
+        service.updateLikeCommandState(stationuuid: "test-station")
+        XCTAssertFalse(MPRemoteCommandCenter.shared().likeCommand.isActive)
     }
 }

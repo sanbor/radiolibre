@@ -80,10 +80,52 @@ struct HistoryEntry: Codable, Identifiable, Hashable, Sendable {
     }
 }
 
+extension Array where Element == HistoryEntry {
+    /// Deduplicates entries by stationuuid, keeping the most recent entry per station,
+    /// sorted by play count descending (tiebreak: most recent first).
+    func deduplicatedByFrequency() -> [HistoryEntry] {
+        var bestEntry: [String: HistoryEntry] = [:]
+        var playCounts: [String: Int] = [:]
+
+        for entry in self {
+            playCounts[entry.stationuuid, default: 0] += 1
+            if let existing = bestEntry[entry.stationuuid] {
+                if entry.playedAt > existing.playedAt {
+                    bestEntry[entry.stationuuid] = entry
+                }
+            } else {
+                bestEntry[entry.stationuuid] = entry
+            }
+        }
+
+        return bestEntry.values.sorted {
+            let count0 = playCounts[$0.stationuuid, default: 0]
+            let count1 = playCounts[$1.stationuuid, default: 0]
+            if count0 != count1 { return count0 > count1 }
+            return $0.playedAt > $1.playedAt
+        }
+    }
+
+    /// Deduplicates entries by stationuuid, keeping the first (most recent) entry per station,
+    /// preserving the original recency order.
+    func deduplicatedByRecency() -> [HistoryEntry] {
+        var seen = Set<String>()
+        return filter { entry in
+            guard !seen.contains(entry.stationuuid) else { return false }
+            seen.insert(entry.stationuuid)
+            return true
+        }
+    }
+}
+
 extension Date {
+    private static let relativeFormatter: RelativeDateTimeFormatter = {
+        let f = RelativeDateTimeFormatter()
+        f.unitsStyle = .short
+        return f
+    }()
+
     var relativeDescription: String {
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .short
-        return formatter.localizedString(for: self, relativeTo: Date())
+        Self.relativeFormatter.localizedString(for: self, relativeTo: Date())
     }
 }

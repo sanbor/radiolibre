@@ -78,12 +78,12 @@ struct CountryListView: View {
                 }
 
                 Color.clear
-                    .frame(height: 20)
+                    .frame(height: LayoutConstants.listBottomPadding)
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
             }
             .listStyle(.plain)
-            .overlay(alignment: .trailing) {
+            .safeAreaInset(edge: .trailing, spacing: 0) {
                 AlphabetIndexView(letters: letters) { letter in
                     withAnimation {
                         proxy.scrollTo(letter, anchor: .top)
@@ -100,7 +100,7 @@ struct CountryListView: View {
             }
 
             Color.clear
-                .frame(height: 20)
+                .frame(height: LayoutConstants.listBottomPadding)
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
         }

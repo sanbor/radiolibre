@@ -5,6 +5,8 @@ Native iOS internet radio player powered by the [Radio Browser](https://www.radi
 - iOS 16+, SwiftUI, no third-party dependencies
 - License: GPL-3.0
 
+> **Current status:** All MVP phases (1–7) and post-MVP phases 8–9 are complete. The app is fully functional with CarPlay and Live Activity support. Next up: post-MVP feature work (sleep timer, widgets, Siri shortcuts, etc.).
+
 ---
 
 ## Data Source
@@ -173,6 +175,10 @@ Three navigation links: Countries, Languages, Tags.
 Paginated list used by all three categories:
 - Page size: 100
 - Default sort: click count descending
+- Sort picker in toolbar (segmented): "Clicks" (default) / "Name"
+- Sorting is server-side via the API `order` parameter; changing sort resets pagination and re-fetches
+- When sorted by name: stations are grouped into letter sections with an alphabet index on the trailing edge for quick navigation
+- When sorted by clicks: flat list (no sections or index)
 - Loads first page on appear
 - Scroll-to-bottom loads next page
 - "Has more" if last page returned exactly 100 results
@@ -293,7 +299,7 @@ Allows HTTP (non-HTTPS) for media streams only via `NSAllowsArbitraryLoadsForMed
 
 ### Live Activity (iOS 16.2+)
 
-The Live Activity is the sole lock screen element — `MPNowPlayingInfoCenter.nowPlayingInfo` is intentionally not set to avoid duplicate overlapping widgets. The `updateNowPlaying()` method is a no-op.
+The Live Activity provides an enhanced lock screen experience. `MPNowPlayingInfoCenter.nowPlayingInfo` is also set by `updateNowPlaying()` with station name, artist metadata (country + codec + bitrate), live stream flag, playback rate, and favicon artwork. Live Activity takes visual priority on the lock screen; `nowPlayingInfo` provides CarPlay Now Playing tab metadata and the standard Control Center widget.
 
 **Lock screen banner** shows:
 - Station favicon (40×40 rounded rect, placeholder radio icon if unavailable)
@@ -317,8 +323,6 @@ The Live Activity is the sole lock screen element — `MPNowPlayingInfoCenter.no
 **Favicon in widget:** Widget extensions cannot make network requests. `LiveActivityService` fetches the favicon via `ImageCacheService` in the main app, resizes to 80×80 JPEG (~2-4KB), and passes the bytes through `ContentState.faviconData: Data?`. On station change, favicon is fetched asynchronously and the activity is re-updated when ready.
 
 **Playback controls** (iOS 17+): `TogglePlaybackIntent` and `StopPlaybackIntent` conform to `LiveActivityIntent`. They call `RadioPlaybackAction` closures (wired to `AudioPlayerService` at launch), which run in the main app process. Shared source files in `Shared/` are compiled into both the app and widget extension targets.
-
-**Caveat:** CarPlay's `CPNowPlayingTemplate` reads from `nowPlayingInfo`, so the CarPlay Now Playing tab shows blank metadata. Station lists and playback still work. Can be addressed separately.
 
 ### Remote Commands
 
@@ -442,3 +446,84 @@ No Combine observers or NotificationCenter — data sets are small and service c
 ### Configuration
 
 Requires `CPTemplateApplicationSceneSessionRoleApplication` in `UISceneConfigurations` (Info.plist) and the `com.apple.developer.carplay-audio` entitlement when code signing is enabled.
+
+---
+
+## Roadmap
+
+### Completed Phases
+
+| Phase | Name | Status |
+|---|---|---|
+| 1 | Foundation | Done |
+| 2 | Audio Playback | Done |
+| 3 | Search & Browse | Done |
+| 4 | Persistence (Favorites & History) | Done |
+| 5 | Player UI & Image Cache | Done |
+| 6 | Polish | Done |
+| 7 | Testing | Done |
+| 8 | CarPlay (post-MVP) | Done |
+| 9 | Live Activity (post-MVP) | Done |
+
+### Post-MVP Features (Not Started)
+
+#### Sleep Timer
+
+Countdown timer that automatically stops playback after a user-selected duration. Timer UI in the full player with preset durations (15m, 30m, 60m, 90m, custom). Uses `Task.sleep` for the countdown. Timer persists across screens but not across app restarts. Shows remaining time in the mini player when active.
+
+#### Stream Recording
+
+Record live radio audio to files on device. Uses `AVAssetWriter` to capture audio buffers from the active stream. Recordings saved to the app's documents directory. UI to start/stop recording from the full player, with a recording indicator in the mini player. List view to browse and play back saved recordings. Metadata (station name, date, duration) stored alongside each file.
+
+#### Track History (Song Log)
+
+Log ICY metadata (artist + track title) parsed from streams over time. Persisted via SwiftData as `TrackHistoryEntry` records. Provides a scrollable song log per station showing what was playing and when. Optional integration with MusicBrainz or Last.fm for album art and track metadata enrichment.
+
+#### Widgets
+
+WidgetKit home screen widgets:
+- **Now Playing widget** — shows current station name, favicon, and playback state. Tapping opens the app.
+- **Favorites widget** — shows a grid or list of favorite stations. Tapping a station launches the app and starts playback.
+
+Uses `AppIntentTimelineProvider` for widget configuration. Shared data between app and widget extension via App Group container.
+
+#### Siri Shortcuts
+
+`AppIntent` conformances enabling voice-activated playback:
+- "Play [station name]" — searches favorites first, then API, and plays the best match.
+- "Play my favorites" — starts playing the first favorite station.
+- Donated intents for recently played stations so they appear as Siri suggestions.
+
+#### Geo Search
+
+Find stations near the user's current location using the Radio Browser geo search API (`/json/stations/search?geo_lat=&geo_long=&geo_distance=`). Requires `CoreLocation` permission. Map view showing nearby stations as pins, or list view sorted by distance. Configurable search radius.
+
+#### M3U Export/Import
+
+Share favorites as standard M3U playlist files with a custom `#RADIOBROWSERUUID:` extension tag for round-trip fidelity:
+- **Export:** generates an M3U file from the favorites list via `FileDocument` and the system share sheet.
+- **Import:** file picker accepts `.m3u` files, parses entries, and batch-lookups station UUIDs against the API to add to favorites.
+
+#### Alarm
+
+Wake-up alarm that starts radio playback at a scheduled time:
+- Time picker with repeating day selection (weekdays, weekends, custom).
+- Station picker (from favorites or search).
+- Uses `UNNotificationRequest` to trigger at the scheduled time, with background audio activation to start the stream.
+- Gradual volume ramp-up option.
+
+#### Metered Connection Warning
+
+Prompt before starting playback on a cellular or metered connection. Uses `NWPathMonitor` to detect `.constrained` path status. User can dismiss or set a "don't ask again" preference. Configurable in settings.
+
+#### Fallback Stations
+
+Bundled `fallback_stations.json` resource with a curated set of reliable stations. Shown on the Discover screen when the network is unavailable, ensuring the app is never completely empty on first launch without connectivity.
+
+#### iPad Layout
+
+Sidebar navigation with `NavigationSplitView` replacing the tab bar on iPad. Sidebar shows Discover, Recent, Search, Browse, Favorites. Detail pane shows content. Mini player spans the full width at the bottom.
+
+#### macOS (Catalyst or native)
+
+Menu bar player with a popover showing the mini player and quick access to favorites. Full window with sidebar navigation matching the iPad layout. Native keyboard shortcuts for playback control.

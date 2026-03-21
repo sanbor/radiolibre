@@ -5,7 +5,6 @@ final class FavoritesViewModel: ObservableObject {
     @Published var favorites: [FavoriteStation] = []
     @Published var isLoading = false
     @Published var isSyncing = false
-    @Published var error: String?
 
     private let favoritesService: FavoritesService
 

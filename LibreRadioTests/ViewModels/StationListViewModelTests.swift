@@ -204,6 +204,98 @@ final class StationListViewModelTests: XCTestCase {
         XCTAssertFalse(vm.isLoading)
     }
 
+    // MARK: - Sort Order
+
+    func testDefaultSortOrderIsClicks() {
+        let vm = StationListViewModel(filter: .country("AR"), service: service)
+        XCTAssertEqual(vm.sortOrder, .byClicks)
+    }
+
+    func testFetchPassesClickSortParams() async {
+        var capturedURL: URL?
+        MockURLProtocol.requestHandler = { request in
+            capturedURL = request.url
+            let data = TestFixtures.stationArrayJSON(count: 1).data(using: .utf8)!
+            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+            return (response, data)
+        }
+
+        let vm = StationListViewModel(filter: .country("AR"), service: service)
+        await vm.load()
+
+        let query = capturedURL?.query ?? ""
+        XCTAssertTrue(query.contains("order=clickcount"))
+        XCTAssertTrue(query.contains("reverse=true"))
+    }
+
+    func testFetchPassesNameSortParams() async {
+        var capturedURL: URL?
+        MockURLProtocol.requestHandler = { request in
+            capturedURL = request.url
+            let data = TestFixtures.stationArrayJSON(count: 1).data(using: .utf8)!
+            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+            return (response, data)
+        }
+
+        let vm = StationListViewModel(filter: .tag("rock"), service: service)
+        vm.sortOrder = .byName
+        await vm.load()
+
+        let query = capturedURL?.query ?? ""
+        XCTAssertTrue(query.contains("order=name"))
+        XCTAssertTrue(query.contains("reverse=false"))
+    }
+
+    func testReloadForCurrentSortResetsState() async {
+        var requestCount = 0
+        MockURLProtocol.requestHandler = { request in
+            requestCount += 1
+            let data = TestFixtures.stationArrayJSON(count: 3).data(using: .utf8)!
+            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+            return (response, data)
+        }
+
+        let vm = StationListViewModel(filter: .country("US"), service: service)
+        await vm.load()
+        XCTAssertEqual(vm.stations.count, 3)
+        XCTAssertEqual(requestCount, 1)
+
+        vm.sortOrder = .byName
+        await vm.reloadForCurrentSort()
+        XCTAssertEqual(vm.stations.count, 3)
+        XCTAssertEqual(requestCount, 2)
+        XCTAssertNil(vm.error)
+    }
+
+    func testSectionedStationsGroupsByFirstLetter() {
+        let vm = StationListViewModel(filter: .country("AR"), service: service)
+        vm.stations = [
+            TestFixtures.makeStation(uuid: "1", name: "Alpha FM"),
+            TestFixtures.makeStation(uuid: "2", name: "Bravo Radio"),
+            TestFixtures.makeStation(uuid: "3", name: "Another Station"),
+        ]
+
+        let sections = vm.sectionedStations
+        XCTAssertEqual(sections.count, 2)
+        XCTAssertEqual(sections[0].letter, "A")
+        XCTAssertEqual(sections[0].stations.count, 2)
+        XCTAssertEqual(sections[1].letter, "B")
+        XCTAssertEqual(sections[1].stations.count, 1)
+    }
+
+    func testSectionedStationsEmptyName() {
+        let vm = StationListViewModel(filter: .country("AR"), service: service)
+        vm.stations = [
+            TestFixtures.makeStation(uuid: "1", name: "  "),
+            TestFixtures.makeStation(uuid: "2", name: "Zulu FM"),
+        ]
+
+        let sections = vm.sectionedStations
+        XCTAssertEqual(sections.count, 2)
+        XCTAssertEqual(sections[0].letter, "#")
+        XCTAssertEqual(sections[1].letter, "Z")
+    }
+
     // MARK: - Helpers
 
     private func setMockResponse(json: String) {

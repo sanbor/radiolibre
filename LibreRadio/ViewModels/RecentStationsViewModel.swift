@@ -15,7 +15,7 @@ final class RecentStationsViewModel: ObservableObject {
     func load() async {
         guard !isLoading else { return }
         isLoading = true
-        entries = await historyService.allEntries()
+        entries = await historyService.allEntries().deduplicatedByRecency()
         isLoading = false
     }
 

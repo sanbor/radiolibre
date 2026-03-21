@@ -3,46 +3,37 @@ import SwiftUI
 struct MiniPlayerView: View {
     @EnvironmentObject private var playerVM: PlayerViewModel
     @EnvironmentObject private var favoritesVM: FavoritesViewModel
-    @State private var showFullPlayer = false
 
-    @GestureState private var dragOffset: CGFloat = 0
+    let station: StationDTO?
 
     var body: some View {
-        Group {
-            if let station = playerVM.currentStation {
-                VStack(spacing: 0) {
-                    dragHandle
-                    activeContent(station: station)
-                }
-                .contentShape(Rectangle())
-                .onTapGesture { showFullPlayer = true }
-                .gesture(
-                    DragGesture(minimumDistance: 20)
-                        .updating($dragOffset) { value, state, _ in
-                            state = value.translation.height
-                        }
-                        .onEnded { value in
-                            if value.translation.height < -30 {
-                                showFullPlayer = true
-                            }
-                        }
-                )
-                .sheet(isPresented: $showFullPlayer) {
-                    FullPlayerView()
-                }
-            } else {
-                idleContent
-            }
+        if let station {
+            activeContent(station: station)
+        } else {
+            idleContent
         }
-        .background(.ultraThinMaterial)
     }
 
-    private var dragHandle: some View {
-        Capsule()
-            .fill(.tertiary)
-            .frame(width: 36, height: 5)
-            .padding(.top, 6)
+    // MARK: - Idle State
+
+    private var idleContent: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "radio")
+                .font(.title2)
+                .foregroundStyle(.secondary)
+                .frame(width: 40, height: 40)
+
+            Text("No station playing")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            Spacer()
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 8)
     }
+
+    // MARK: - Active State
 
     private func activeContent(station: StationDTO) -> some View {
         HStack(spacing: 12) {
@@ -127,21 +118,6 @@ struct MiniPlayerView: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Stop")
-        }
-        .padding(.horizontal)
-        .padding(.vertical, 8)
-    }
-
-    private var idleContent: some View {
-        HStack(spacing: 12) {
-            FaviconImageView(url: nil, size: 40)
-
-            Text("Not Playing")
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .foregroundStyle(.secondary)
-
-            Spacer()
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
