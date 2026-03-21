@@ -48,7 +48,8 @@ struct StationDTO: Codable, Identifiable, Hashable, Sendable {
 
     var homepageURL: URL? {
         guard let homepage, !homepage.isEmpty else { return nil }
-        return URL(string: homepage)
+        if let url = URL(string: homepage) { return url }
+        return URL(string: homepage.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed) ?? homepage)
     }
 
     var bitrateLabel: String {

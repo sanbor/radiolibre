@@ -166,7 +166,7 @@ struct FullPlayerView: View {
             .clipShape(RoundedRectangle(cornerRadius: 12))
 
             // Radio Browser link
-            Link(destination: URL(string: "https://www.radio-browser.info")!) {
+            Link(destination: URL(string: "https://www.radio-browser.info/#/byuuid/\(station.stationuuid)")!) {
                 Label("Radio Browser", systemImage: "radio")
                     .font(.subheadline)
             }

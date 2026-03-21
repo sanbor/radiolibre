@@ -417,7 +417,7 @@ struct StationDTO: Codable, Identifiable, Hashable {
     var isOnline: Bool             // lastcheckok == 1
     var streamURL: URL?            // URL(string: urlResolved ?? url)
     var faviconURL: URL?           // URL(string: favicon ?? "")
-    var homepageURL: URL?          // URL(string: homepage ?? "")
+    var homepageURL: URL?          // URL(string: homepage) with percent-encoding fallback
     var bitrateLabel: String       // e.g. "128k" or "—"
 }
 ```
@@ -1034,7 +1034,7 @@ Full-screen sheet:
 │                                                  │
 │         Codec: MP3  ·  Bitrate: 128 kbps         │
 │         Last checked: 2 hours ago ✅              │
-│         Radio Browser: radio-browser.info →      │
+│         Radio Browser: radio-browser.info/#/byuuid/… →│
 │         Website: station.example.com →           │
 │                                                  │
 └──────────────────────────────────────────────────┘

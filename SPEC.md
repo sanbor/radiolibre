@@ -363,8 +363,8 @@ Shows:
 - Vote button
 - Tag chips
 - Station metadata: codec, bitrate, last check status + time
-- Radio Browser link (opens radio-browser.info)
-- Homepage link (opens in Safari)
+- Radio Browser link (opens station page at `radio-browser.info/#/byuuid/{stationuuid}`)
+- Homepage link (opens in Safari; percent-encodes URL for stations with special characters in their homepage)
 
 Previous/next cycle through favorites.
 
