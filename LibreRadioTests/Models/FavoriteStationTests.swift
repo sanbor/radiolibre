@@ -18,6 +18,7 @@ final class FavoriteStationTests: XCTestCase {
         XCTAssertNil(fav.faviconURL)
         XCTAssertNil(fav.tags)
         XCTAssertNil(fav.countrycode)
+        XCTAssertNil(fav.state)
         XCTAssertNil(fav.language)
         XCTAssertNil(fav.codec)
         XCTAssertEqual(fav.bitrate, 0)
@@ -31,6 +32,8 @@ final class FavoriteStationTests: XCTestCase {
             url: "http://stream.test/live",
             urlResolved: "http://stream.test/resolved",
             tags: "rock,pop",
+            countrycode: "AR",
+            state: "Buenos Aires",
             codec: "MP3",
             bitrate: 128
         )
@@ -41,6 +44,8 @@ final class FavoriteStationTests: XCTestCase {
         XCTAssertEqual(fav.name, "Test Radio")
         XCTAssertEqual(fav.urlResolved, "http://stream.test/resolved")
         XCTAssertEqual(fav.tags, "rock,pop")
+        XCTAssertEqual(fav.countrycode, "AR")
+        XCTAssertEqual(fav.state, "Buenos Aires")
         XCTAssertEqual(fav.codec, "MP3")
         XCTAssertEqual(fav.bitrate, 128)
         XCTAssertEqual(fav.sortOrder, 3)
@@ -76,6 +81,7 @@ final class FavoriteStationTests: XCTestCase {
             faviconURL: "http://img.test/icon.png",
             tags: "rock,jazz",
             countrycode: "US",
+            state: "California",
             language: "english",
             codec: "AAC",
             bitrate: 256,
@@ -92,6 +98,7 @@ final class FavoriteStationTests: XCTestCase {
         XCTAssertEqual(decoded.faviconURL, fav.faviconURL)
         XCTAssertEqual(decoded.tags, fav.tags)
         XCTAssertEqual(decoded.countrycode, fav.countrycode)
+        XCTAssertEqual(decoded.state, fav.state)
         XCTAssertEqual(decoded.language, fav.language)
         XCTAssertEqual(decoded.codec, fav.codec)
         XCTAssertEqual(decoded.bitrate, fav.bitrate)
@@ -136,6 +143,7 @@ final class FavoriteStationTests: XCTestCase {
             faviconURL: "http://img.test/icon.png",
             tags: "rock,pop",
             countrycode: "US",
+            state: "California",
             language: "english",
             codec: "MP3",
             bitrate: 128
@@ -150,6 +158,7 @@ final class FavoriteStationTests: XCTestCase {
         XCTAssertEqual(dto.favicon, "http://img.test/icon.png")
         XCTAssertEqual(dto.tags, "rock,pop")
         XCTAssertEqual(dto.countrycode, "US")
+        XCTAssertEqual(dto.state, "California")
         XCTAssertEqual(dto.language, "english")
         XCTAssertEqual(dto.codec, "MP3")
         XCTAssertEqual(dto.bitrate, 128)

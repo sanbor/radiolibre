@@ -9,6 +9,7 @@ struct HistoryEntry: Codable, Identifiable, Hashable, Sendable {
     let codec: String?
     let bitrate: Int
     let countrycode: String?
+    let state: String?
     var playedAt: Date
 
     init(
@@ -20,6 +21,7 @@ struct HistoryEntry: Codable, Identifiable, Hashable, Sendable {
         codec: String? = nil,
         bitrate: Int = 0,
         countrycode: String? = nil,
+        state: String? = nil,
         playedAt: Date = Date()
     ) {
         self.id = id
@@ -30,6 +32,7 @@ struct HistoryEntry: Codable, Identifiable, Hashable, Sendable {
         self.codec = codec
         self.bitrate = bitrate
         self.countrycode = countrycode
+        self.state = state
         self.playedAt = playedAt
     }
 
@@ -42,6 +45,7 @@ struct HistoryEntry: Codable, Identifiable, Hashable, Sendable {
         self.codec = station.codec
         self.bitrate = station.bitrate ?? 0
         self.countrycode = station.countrycode
+        self.state = station.state
         self.playedAt = Date()
     }
 
@@ -61,7 +65,7 @@ struct HistoryEntry: Codable, Identifiable, Hashable, Sendable {
             tags: nil,
             country: nil,
             countrycode: countrycode,
-            state: nil,
+            state: state,
             language: nil,
             languagecodes: nil,
             codec: codec,

@@ -8,6 +8,7 @@ struct FavoriteStation: Codable, Identifiable, Hashable, Sendable {
     let faviconURL: String?
     let tags: String?
     let countrycode: String?
+    let state: String?
     let language: String?
     let codec: String?
     let bitrate: Int
@@ -22,6 +23,7 @@ struct FavoriteStation: Codable, Identifiable, Hashable, Sendable {
         faviconURL: String? = nil,
         tags: String? = nil,
         countrycode: String? = nil,
+        state: String? = nil,
         language: String? = nil,
         codec: String? = nil,
         bitrate: Int = 0,
@@ -35,6 +37,7 @@ struct FavoriteStation: Codable, Identifiable, Hashable, Sendable {
         self.faviconURL = faviconURL
         self.tags = tags
         self.countrycode = countrycode
+        self.state = state
         self.language = language
         self.codec = codec
         self.bitrate = bitrate
@@ -50,6 +53,7 @@ struct FavoriteStation: Codable, Identifiable, Hashable, Sendable {
         self.faviconURL = station.favicon
         self.tags = station.tags
         self.countrycode = station.countrycode
+        self.state = station.state
         self.language = station.language
         self.codec = station.codec
         self.bitrate = station.bitrate ?? 0
@@ -78,7 +82,7 @@ struct FavoriteStation: Codable, Identifiable, Hashable, Sendable {
             tags: tags,
             country: nil,
             countrycode: countrycode,
-            state: nil,
+            state: state,
             language: language,
             languagecodes: nil,
             codec: codec,

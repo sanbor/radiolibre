@@ -19,6 +19,7 @@ final class HistoryEntryTests: XCTestCase {
         XCTAssertNil(entry.codec)
         XCTAssertEqual(entry.bitrate, 0)
         XCTAssertNil(entry.countrycode)
+        XCTAssertNil(entry.state)
     }
 
     func testInitFromStationDTO() {
@@ -27,6 +28,8 @@ final class HistoryEntryTests: XCTestCase {
             name: "Test Radio",
             url: "http://stream.test/live",
             urlResolved: "http://stream.test/resolved",
+            countrycode: "AR",
+            state: "Buenos Aires",
             codec: "MP3",
             bitrate: 128
         )
@@ -36,6 +39,8 @@ final class HistoryEntryTests: XCTestCase {
         XCTAssertEqual(entry.stationuuid, "uuid-1")
         XCTAssertEqual(entry.name, "Test Radio")
         XCTAssertEqual(entry.urlResolved, "http://stream.test/resolved")
+        XCTAssertEqual(entry.countrycode, "AR")
+        XCTAssertEqual(entry.state, "Buenos Aires")
         XCTAssertEqual(entry.codec, "MP3")
         XCTAssertEqual(entry.bitrate, 128)
     }
@@ -76,6 +81,7 @@ final class HistoryEntryTests: XCTestCase {
             codec: "AAC",
             bitrate: 256,
             countrycode: "US",
+            state: "California",
             playedAt: Date(timeIntervalSince1970: 1000)
         )
 
@@ -89,6 +95,7 @@ final class HistoryEntryTests: XCTestCase {
         XCTAssertEqual(decoded.codec, entry.codec)
         XCTAssertEqual(decoded.bitrate, entry.bitrate)
         XCTAssertEqual(decoded.countrycode, entry.countrycode)
+        XCTAssertEqual(decoded.state, entry.state)
         XCTAssertEqual(decoded.playedAt, entry.playedAt)
     }
 
@@ -114,7 +121,8 @@ final class HistoryEntryTests: XCTestCase {
             faviconURL: "http://img.test/icon.png",
             codec: "MP3",
             bitrate: 128,
-            countrycode: "US"
+            countrycode: "US",
+            state: "California"
         )
 
         let dto = entry.toStationDTO()
@@ -127,6 +135,7 @@ final class HistoryEntryTests: XCTestCase {
         XCTAssertEqual(dto.codec, "MP3")
         XCTAssertEqual(dto.bitrate, 128)
         XCTAssertEqual(dto.countrycode, "US")
+        XCTAssertEqual(dto.state, "California")
     }
 
     // MARK: - Date Relative Description
