@@ -1,7 +1,7 @@
 import Foundation
 
 @MainActor
-final class DiscoverViewModel: ObservableObject {
+final class HomeViewModel: ObservableObject {
     @Published var favoriteStations: [StationDTO] = []
     @Published var recentStations: [StationDTO] = []
     @Published var localStations: [StationDTO] = []
@@ -42,10 +42,10 @@ final class DiscoverViewModel: ObservableObject {
 
         // Load from cache first
         let cachedLocal: [StationDTO]? = await cache.load(key: localCacheKey)
-        let cachedClicks: [StationDTO]? = await cache.load(key: StationCacheService.discoverTopClicks)
-        let cachedVotes: [StationDTO]? = await cache.load(key: StationCacheService.discoverTopVotes)
-        let cachedChanged: [StationDTO]? = await cache.load(key: StationCacheService.discoverRecentlyChanged)
-        let cachedPlaying: [StationDTO]? = await cache.load(key: StationCacheService.discoverCurrentlyPlaying)
+        let cachedClicks: [StationDTO]? = await cache.load(key: StationCacheService.homeTopClicks)
+        let cachedVotes: [StationDTO]? = await cache.load(key: StationCacheService.homeTopVotes)
+        let cachedChanged: [StationDTO]? = await cache.load(key: StationCacheService.homeRecentlyChanged)
+        let cachedPlaying: [StationDTO]? = await cache.load(key: StationCacheService.homeCurrentlyPlaying)
 
         let hasCache = cachedLocal != nil || cachedClicks != nil || cachedVotes != nil
             || cachedChanged != nil || cachedPlaying != nil
@@ -74,10 +74,10 @@ final class DiscoverViewModel: ObservableObject {
 
             // Update cache
             await cache.save(key: localCacheKey, value: localStations)
-            await cache.save(key: StationCacheService.discoverTopClicks, value: topByClicks)
-            await cache.save(key: StationCacheService.discoverTopVotes, value: topByVotes)
-            await cache.save(key: StationCacheService.discoverRecentlyChanged, value: recentlyChanged)
-            await cache.save(key: StationCacheService.discoverCurrentlyPlaying, value: currentlyPlaying)
+            await cache.save(key: StationCacheService.homeTopClicks, value: topByClicks)
+            await cache.save(key: StationCacheService.homeTopVotes, value: topByVotes)
+            await cache.save(key: StationCacheService.homeRecentlyChanged, value: recentlyChanged)
+            await cache.save(key: StationCacheService.homeCurrentlyPlaying, value: currentlyPlaying)
         } catch let appError as AppError {
             if !hasCache { error = appError }
         } catch {

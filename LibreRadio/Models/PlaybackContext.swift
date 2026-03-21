@@ -5,13 +5,13 @@ enum PlaybackContextSource: Equatable {
     case recent
     case search
     case browse(title: String)
-    case discoverFavorites
-    case discoverRecent
-    case discoverLocal
-    case discoverTopClicks
-    case discoverTopVotes
-    case discoverRecentlyChanged
-    case discoverCurrentlyPlaying
+    case homeFavorites
+    case homeRecent
+    case homeLocal
+    case homeTopClicks
+    case homeTopVotes
+    case homeRecentlyChanged
+    case homeCurrentlyPlaying
     case standalone
 }
 

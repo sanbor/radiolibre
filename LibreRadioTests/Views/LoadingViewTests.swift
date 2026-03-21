@@ -13,8 +13,8 @@ final class LoadingViewTests: XCTestCase {
 
     @MainActor
     func testLoadingViewCustomMessage() {
-        let view = LoadingView(message: "Discovering stations...")
+        let view = LoadingView(message: "Loading stations...")
         _ = view.body
-        XCTAssertEqual(view.message, "Discovering stations...")
+        XCTAssertEqual(view.message, "Loading stations...")
     }
 }

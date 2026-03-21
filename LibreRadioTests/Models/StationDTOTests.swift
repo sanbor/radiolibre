@@ -162,6 +162,12 @@ final class StationDTOTests: XCTestCase {
         XCTAssertEqual(station.homepageURL?.absoluteString, "https://example.com")
     }
 
+    func testHomepageURLPercentEncodingFallback() {
+        let station = StationDTOTests.makeStation(homepage: "https://example.com/my station")
+        XCTAssertNotNil(station.homepageURL)
+        XCTAssertEqual(station.homepageURL?.absoluteString, "https://example.com/my%20station")
+    }
+
     func testBitrateLabelFormatted() {
         XCTAssertEqual(StationDTOTests.makeStation(bitrate: 128).bitrateLabel, "128k")
         XCTAssertEqual(StationDTOTests.makeStation(bitrate: 320).bitrateLabel, "320k")

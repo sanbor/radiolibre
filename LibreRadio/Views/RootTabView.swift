@@ -8,10 +8,10 @@ struct RootTabView: View {
 
     var body: some View {
         TabView {
-            DiscoverView()
+            HomeView()
                 .safeAreaInset(edge: .bottom, spacing: 0) { miniPlayerSpacer }
                 .tabItem {
-                    Label("Discover", systemImage: "antenna.radiowaves.left.and.right")
+                    Label("Home", systemImage: "house.fill")
                 }
 
             RecentStationsView()

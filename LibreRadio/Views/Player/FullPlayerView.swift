@@ -165,18 +165,18 @@ struct FullPlayerView: View {
             .background(Color(.systemGray6))
             .clipShape(RoundedRectangle(cornerRadius: 12))
 
-            // Radio Browser link
-            Link(destination: URL(string: "https://www.radio-browser.info/#/byuuid/\(station.stationuuid)")!) {
-                Label("Radio Browser", systemImage: "radio")
-                    .font(.subheadline)
-            }
-
             // Homepage link
             if let homepageURL = station.homepageURL {
                 Link(destination: homepageURL) {
-                    Label("Visit Homepage", systemImage: "globe")
+                    Label("Visit Station", systemImage: "globe")
                         .font(.subheadline)
                 }
+            }
+
+            // Radio Browser link
+            Link(destination: URL(string: "https://www.radio-browser.info/history/\(station.stationuuid)")!) {
+                Label("Radio Browser", systemImage: "radio")
+                    .font(.subheadline)
             }
 
             Spacer(minLength: 20)

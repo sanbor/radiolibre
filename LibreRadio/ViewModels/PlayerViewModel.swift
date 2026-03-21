@@ -147,10 +147,10 @@ final class PlayerViewModel: ObservableObject {
 
     private func resolveStations(for context: PlaybackContext) async -> [StationDTO] {
         switch context.source {
-        case .favorites, .discoverFavorites:
+        case .favorites, .homeFavorites:
             let favorites = await favoritesService.allFavorites()
             return favorites.map { $0.toStationDTO() }
-        case .recent, .discoverRecent:
+        case .recent, .homeRecent:
             let entries = await historyService.recentEntries(limit: 50)
             return entries.map { $0.toStationDTO() }
         default:

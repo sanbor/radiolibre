@@ -1,14 +1,14 @@
 import SwiftUI
 
-struct DiscoverView: View {
-    @StateObject private var viewModel = DiscoverViewModel()
+struct HomeView: View {
+    @StateObject private var viewModel = HomeViewModel()
     @EnvironmentObject private var playerVM: PlayerViewModel
 
     var body: some View {
         NavigationStack {
             Group {
                 if viewModel.isLoading && viewModel.topByClicks.isEmpty {
-                    LoadingView(message: "Discovering stations...")
+                    LoadingView(message: "Loading stations...")
                 } else if let error = viewModel.error, viewModel.topByClicks.isEmpty {
                     ErrorView(error: error) {
                         await viewModel.refresh()
@@ -17,7 +17,7 @@ struct DiscoverView: View {
                     stationsList
                 }
             }
-            .navigationTitle("Discover")
+            .navigationTitle("Home")
             .task { await viewModel.load() }
             .refreshable { await viewModel.refresh() }
         }
@@ -28,7 +28,7 @@ struct DiscoverView: View {
             if !viewModel.favoriteStations.isEmpty {
                 Section {
                     StationCarouselView(title: "Favorites", stations: viewModel.favoriteStations) { station in
-                        let context = PlaybackContext(source: .discoverFavorites, stations: viewModel.favoriteStations)
+                        let context = PlaybackContext(source: .homeFavorites, stations: viewModel.favoriteStations)
                         playerVM.play(station: station, context: context)
                     }
                 }
@@ -39,7 +39,7 @@ struct DiscoverView: View {
             if !viewModel.recentStations.isEmpty {
                 Section {
                     StationCarouselView(title: "Recently Played", stations: viewModel.recentStations) { station in
-                        let context = PlaybackContext(source: .discoverRecent, stations: viewModel.recentStations)
+                        let context = PlaybackContext(source: .homeRecent, stations: viewModel.recentStations)
                         playerVM.play(station: station, context: context)
                     }
                 }
@@ -50,7 +50,7 @@ struct DiscoverView: View {
             if !viewModel.localStations.isEmpty {
                 Section {
                     StationCarouselView(title: "Local Stations", stations: viewModel.localStations) { station in
-                        let context = PlaybackContext(source: .discoverLocal, stations: viewModel.localStations)
+                        let context = PlaybackContext(source: .homeLocal, stations: viewModel.localStations)
                         playerVM.play(station: station, context: context)
                     }
                 }
@@ -61,7 +61,7 @@ struct DiscoverView: View {
             if !viewModel.topByClicks.isEmpty {
                 Section {
                     StationCarouselView(title: "Top Stations", stations: viewModel.topByClicks) { station in
-                        let context = PlaybackContext(source: .discoverTopClicks, stations: viewModel.topByClicks)
+                        let context = PlaybackContext(source: .homeTopClicks, stations: viewModel.topByClicks)
                         playerVM.play(station: station, context: context)
                     }
                 }
@@ -72,7 +72,7 @@ struct DiscoverView: View {
             if !viewModel.topByVotes.isEmpty {
                 Section {
                     StationCarouselView(title: "Most Voted", stations: viewModel.topByVotes) { station in
-                        let context = PlaybackContext(source: .discoverTopVotes, stations: viewModel.topByVotes)
+                        let context = PlaybackContext(source: .homeTopVotes, stations: viewModel.topByVotes)
                         playerVM.play(station: station, context: context)
                     }
                 }
@@ -84,7 +84,7 @@ struct DiscoverView: View {
                 verticalSection(
                     title: "Recently Changed",
                     stations: Array(viewModel.recentlyChanged.prefix(10)),
-                    source: .discoverRecentlyChanged
+                    source: .homeRecentlyChanged
                 )
             }
 
@@ -92,7 +92,7 @@ struct DiscoverView: View {
                 verticalSection(
                     title: "Now Playing",
                     stations: Array(viewModel.currentlyPlaying.prefix(10)),
-                    source: .discoverCurrentlyPlaying
+                    source: .homeCurrentlyPlaying
                 )
             }
         }

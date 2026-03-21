@@ -86,7 +86,7 @@ Rules:
 
 | Tab | Icon | Screen |
 |---|---|---|
-| Discover | antenna.radiowaves.left.and.right | Home with curated sections |
+| Home | house.fill | Home with curated sections |
 | Recent | clock | Recently played stations |
 | Search | magnifyingglass | Search with filters |
 | Browse | list.bullet | Countries / Languages / Tags |
@@ -96,7 +96,7 @@ A mini player bar sits above the tab bar whenever a station is loaded.
 
 ---
 
-## Discover (Home)
+## Home
 
 Shows curated station sections at a glance.
 
@@ -363,7 +363,7 @@ Shows:
 - Vote button
 - Tag chips
 - Station metadata: codec, bitrate, last check status + time
-- Radio Browser link (opens station page at `radio-browser.info/#/byuuid/{stationuuid}`)
+- Radio Browser link (opens station page at `radio-browser.info/history/{stationuuid}`)
 - Homepage link (opens in Safari; percent-encodes URL for stations with special characters in their homepage)
 
 Previous/next cycle through favorites.

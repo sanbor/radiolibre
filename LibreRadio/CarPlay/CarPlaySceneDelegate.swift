@@ -107,7 +107,7 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
                     bitrate: dto.bitrate.flatMap { $0 > 0 ? $0 : nil },
                     faviconURLString: dto.favicon,
                     station: dto,
-                    context: PlaybackContext(source: .discoverTopClicks, stations: stations)
+                    context: PlaybackContext(source: .homeTopClicks, stations: stations)
                 )
             }
             popularTemplate.updateSections([CPListSection(items: items)])

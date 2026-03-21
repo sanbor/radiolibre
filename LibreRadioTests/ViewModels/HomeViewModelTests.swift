@@ -2,7 +2,7 @@ import XCTest
 @testable import LibreRadio
 
 @MainActor
-final class DiscoverViewModelTests: XCTestCase {
+final class HomeViewModelTests: XCTestCase {
 
     private var discovery: ServerDiscoveryService!
     private var service: RadioBrowserService!
@@ -18,7 +18,7 @@ final class DiscoverViewModelTests: XCTestCase {
         let session = TestFixtures.makeMockSession()
         service = RadioBrowserService(discovery: discovery, session: session)
 
-        suiteName = "test.discover.\(UUID().uuidString)"
+        suiteName = "test.home.\(UUID().uuidString)"
         let testDefaults = UserDefaults(suiteName: suiteName)!
         cache = StationCacheService(defaults: testDefaults)
         favoritesService = FavoritesService(defaults: testDefaults, radioBrowserService: service)
@@ -39,7 +39,7 @@ final class DiscoverViewModelTests: XCTestCase {
             return (response, data)
         }
 
-        let vm = DiscoverViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
+        let vm = HomeViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
         await vm.load()
 
         XCTAssertFalse(vm.isLoading)
@@ -56,7 +56,7 @@ final class DiscoverViewModelTests: XCTestCase {
             throw URLError(.notConnectedToInternet)
         }
 
-        let vm = DiscoverViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
+        let vm = HomeViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
         await vm.load()
 
         XCTAssertFalse(vm.isLoading)
@@ -69,7 +69,7 @@ final class DiscoverViewModelTests: XCTestCase {
             return (response, Data())
         }
 
-        let vm = DiscoverViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
+        let vm = HomeViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
         await vm.load()
 
         XCTAssertNotNil(vm.error)
@@ -84,7 +84,7 @@ final class DiscoverViewModelTests: XCTestCase {
             return (response, data)
         }
 
-        let vm = DiscoverViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
+        let vm = HomeViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
         await vm.load()
         let firstCallCount = callCount
         XCTAssertGreaterThan(firstCallCount, 0)
@@ -100,7 +100,7 @@ final class DiscoverViewModelTests: XCTestCase {
             return (response, data)
         }
 
-        let vm = DiscoverViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
+        let vm = HomeViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
         vm.isLoading = true // simulate already loading
 
         // Should return immediately due to guard
@@ -111,7 +111,7 @@ final class DiscoverViewModelTests: XCTestCase {
     }
 
     func testInitialState() {
-        let vm = DiscoverViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
+        let vm = HomeViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
 
         XCTAssertTrue(vm.favoriteStations.isEmpty)
         XCTAssertTrue(vm.recentStations.isEmpty)
@@ -130,16 +130,16 @@ final class DiscoverViewModelTests: XCTestCase {
         let stations = [TestFixtures.makeStation(uuid: "cached-1", name: "Cached Station")]
         let localCountry = Locale.current.region?.identifier ?? "US"
         await cache.save(key: StationCacheService.localKey(countryCode: localCountry), value: stations)
-        await cache.save(key: StationCacheService.discoverTopClicks, value: stations)
-        await cache.save(key: StationCacheService.discoverTopVotes, value: stations)
-        await cache.save(key: StationCacheService.discoverRecentlyChanged, value: stations)
-        await cache.save(key: StationCacheService.discoverCurrentlyPlaying, value: stations)
+        await cache.save(key: StationCacheService.homeTopClicks, value: stations)
+        await cache.save(key: StationCacheService.homeTopVotes, value: stations)
+        await cache.save(key: StationCacheService.homeRecentlyChanged, value: stations)
+        await cache.save(key: StationCacheService.homeCurrentlyPlaying, value: stations)
 
         MockURLProtocol.requestHandler = { _ in
             throw URLError(.notConnectedToInternet)
         }
 
-        let vm = DiscoverViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
+        let vm = HomeViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
         await vm.load()
 
         XCTAssertEqual(vm.topByClicks.count, 1)
@@ -152,10 +152,10 @@ final class DiscoverViewModelTests: XCTestCase {
         let oldStations = [TestFixtures.makeStation(uuid: "old-1", name: "Old Station")]
         let localCountry = Locale.current.region?.identifier ?? "US"
         await cache.save(key: StationCacheService.localKey(countryCode: localCountry), value: oldStations)
-        await cache.save(key: StationCacheService.discoverTopClicks, value: oldStations)
-        await cache.save(key: StationCacheService.discoverTopVotes, value: oldStations)
-        await cache.save(key: StationCacheService.discoverRecentlyChanged, value: oldStations)
-        await cache.save(key: StationCacheService.discoverCurrentlyPlaying, value: oldStations)
+        await cache.save(key: StationCacheService.homeTopClicks, value: oldStations)
+        await cache.save(key: StationCacheService.homeTopVotes, value: oldStations)
+        await cache.save(key: StationCacheService.homeRecentlyChanged, value: oldStations)
+        await cache.save(key: StationCacheService.homeCurrentlyPlaying, value: oldStations)
 
         MockURLProtocol.requestHandler = { request in
             let data = TestFixtures.stationArrayJSON(count: 3).data(using: .utf8)!
@@ -163,7 +163,7 @@ final class DiscoverViewModelTests: XCTestCase {
             return (response, data)
         }
 
-        let vm = DiscoverViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
+        let vm = HomeViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
         await vm.load()
 
         XCTAssertEqual(vm.topByClicks.count, 3)
@@ -177,10 +177,10 @@ final class DiscoverViewModelTests: XCTestCase {
             return (response, data)
         }
 
-        let vm = DiscoverViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
+        let vm = HomeViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
         await vm.load()
 
-        let cached: [StationDTO]? = await cache.load(key: StationCacheService.discoverTopClicks)
+        let cached: [StationDTO]? = await cache.load(key: StationCacheService.homeTopClicks)
         XCTAssertNotNil(cached)
         XCTAssertEqual(cached?.count, 2)
     }
@@ -190,7 +190,7 @@ final class DiscoverViewModelTests: XCTestCase {
             throw URLError(.notConnectedToInternet)
         }
 
-        let vm = DiscoverViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
+        let vm = HomeViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
         await vm.load()
 
         XCTAssertNotNil(vm.error)
@@ -210,7 +210,7 @@ final class DiscoverViewModelTests: XCTestCase {
             return (response, data)
         }
 
-        let vm = DiscoverViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
+        let vm = HomeViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
         await vm.load()
 
         XCTAssertEqual(vm.favoriteStations.count, 1)
@@ -227,7 +227,7 @@ final class DiscoverViewModelTests: XCTestCase {
             return (response, data)
         }
 
-        let vm = DiscoverViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
+        let vm = HomeViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
         await vm.load()
 
         XCTAssertEqual(vm.recentStations.count, 1)
@@ -241,7 +241,7 @@ final class DiscoverViewModelTests: XCTestCase {
             return (response, data)
         }
 
-        let vm = DiscoverViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
+        let vm = HomeViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
         await vm.load()
 
         XCTAssertTrue(vm.favoriteStations.isEmpty)
@@ -256,7 +256,7 @@ final class DiscoverViewModelTests: XCTestCase {
             return (response, data)
         }
 
-        let vm = DiscoverViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
+        let vm = HomeViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
         await vm.load()
 
         XCTAssertTrue(vm.favoriteStations.isEmpty)
@@ -299,7 +299,7 @@ final class DiscoverViewModelTests: XCTestCase {
             return (response, data)
         }
 
-        let vm = DiscoverViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
+        let vm = HomeViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
         await vm.load()
 
         // Should have 2 unique stations, not 3 (duplicate removed)
@@ -321,7 +321,7 @@ final class DiscoverViewModelTests: XCTestCase {
             return (response, data)
         }
 
-        let vm = DiscoverViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
+        let vm = HomeViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
         await vm.load()
 
         XCTAssertEqual(vm.favoriteStations.count, 1)
@@ -339,7 +339,7 @@ final class DiscoverViewModelTests: XCTestCase {
             throw URLError(.notConnectedToInternet)
         }
 
-        let vm = DiscoverViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
+        let vm = HomeViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
         await vm.load()
 
         // Favorites and recents should still load from local storage
@@ -360,7 +360,7 @@ final class DiscoverViewModelTests: XCTestCase {
             return (response, data)
         }
 
-        let vm = DiscoverViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
+        let vm = HomeViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
         await vm.load()
 
         XCTAssertEqual(vm.favoriteStations.count, 1)
@@ -382,7 +382,7 @@ final class DiscoverViewModelTests: XCTestCase {
             return (response, data)
         }
 
-        let vm = DiscoverViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
+        let vm = HomeViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
         await vm.load()
 
         XCTAssertEqual(vm.favoriteStations.count, 2)

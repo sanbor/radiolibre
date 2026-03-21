@@ -14,16 +14,16 @@ actor StationCacheService {
 
     // MARK: - Cache Keys
 
-    static let discoverTopClicks = "discoverTopClicks"
-    static let discoverTopVotes = "discoverTopVotes"
-    static let discoverRecentlyChanged = "discoverRecentlyChanged"
-    static let discoverCurrentlyPlaying = "discoverCurrentlyPlaying"
+    static let homeTopClicks = "homeTopClicks"
+    static let homeTopVotes = "homeTopVotes"
+    static let homeRecentlyChanged = "homeRecentlyChanged"
+    static let homeCurrentlyPlaying = "homeCurrentlyPlaying"
     static let browseCountries = "browseCountries"
     static let browseLanguages = "browseLanguages"
     static let browseTags = "browseTags"
 
     static func localKey(countryCode: String) -> String {
-        "discoverLocal.\(countryCode)"
+        "homeLocal.\(countryCode)"
     }
 
     // MARK: - Public API

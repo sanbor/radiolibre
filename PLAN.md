@@ -221,12 +221,12 @@ One vote per IP per station per 10 minutes. Returns:
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                        Views (SwiftUI)                  │
-│  RootTabView, DiscoverView, SearchView, BrowseView,     │
+│  RootTabView, HomeView, SearchView, BrowseView,          │
 │  FavoritesView, HistoryView, MiniPlayerView,            │
 │  FullPlayerView, StationRowView, ...                    │
 ├─────────────────────────────────────────────────────────┤
 │                    ViewModels (@MainActor)               │
-│  DiscoverVM, SearchVM, BrowseVM, StationListVM,         │
+│  HomeVM, SearchVM, BrowseVM, StationListVM,              │
 │  PlayerVM, FavoritesVM, HistoryVM                       │
 ├─────────────────────────────────────────────────────────┤
 │                      Services (actor / @MainActor)      │
@@ -299,7 +299,7 @@ LibreRadio/
 │   │   └── ImageCacheService.swift              # NSCache + disk cache for favicons
 │   │
 │   ├── ViewModels/
-│   │   ├── DiscoverViewModel.swift              # Home: top click, top vote, local stations
+│   │   ├── HomeViewModel.swift                  # Home: top click, top vote, local stations
 │   │   ├── SearchViewModel.swift                # Search with debounce + filters + pagination
 │   │   ├── BrowseViewModel.swift                # Country/language/tag list loading
 │   │   ├── StationListViewModel.swift           # Reusable: filtered station list + pagination
@@ -308,10 +308,10 @@ LibreRadio/
 │   │   └── RecentStationsViewModel.swift        # Recent stations list, clear all
 │   │
 │   ├── Views/
-│   │   ├── RootTabView.swift                    # TabView: Discover, Recent, Search, Browse, Favorites
+│   │   ├── RootTabView.swift                    # TabView: Home, Recent, Search, Browse, Favorites
 │   │   │
-│   │   ├── Discover/
-│   │   │   ├── DiscoverView.swift               # Home screen: local, top click, top vote, recent, trending
+│   │   ├── Home/
+│   │   │   ├── HomeView.swift                   # Home screen: local, top click, top vote, recent, trending
 │   │   │   └── StationCarouselView.swift        # Horizontal scroll row of station cards
 │   │   │
 │   │   ├── Search/
@@ -370,7 +370,7 @@ LibreRadio/
     │   └── AudioPlayerServiceTests.swift
     └── ViewModels/
         ├── SearchViewModelTests.swift
-        ├── DiscoverViewModelTests.swift
+        ├── HomeViewModelTests.swift
         └── FavoritesViewModelTests.swift
 ```
 
@@ -747,11 +747,11 @@ actor ImageCacheService {
 
 ### ViewModels
 
-#### `DiscoverViewModel.swift`
+#### `HomeViewModel.swift`
 
 ```swift
 @MainActor
-final class DiscoverViewModel: ObservableObject {
+final class HomeViewModel: ObservableObject {
     @Published var favoriteStations: [StationDTO] = []   // From FavoritesService (local)
     @Published var recentStations: [StationDTO] = []     // From HistoryService (local, limit 10)
     @Published var localStations: [StationDTO] = []
@@ -919,7 +919,7 @@ final class FavoritesViewModel: ObservableObject {
 
 ```swift
 TabView {
-    DiscoverView()       // .tabItem { Label("Discover", systemImage: "antenna.radiowaves.left.and.right") }
+    HomeView()           // .tabItem { Label("Home", systemImage: "house.fill") }
     SearchView()         // .tabItem { Label("Search", systemImage: "magnifyingglass") }
     BrowseView()         // .tabItem { Label("Browse", systemImage: "list.bullet") }
     FavoritesView()      // .tabItem { Label("Favorites", systemImage: "heart.fill") }
@@ -935,7 +935,7 @@ TabView {
 
 Each tab wraps content in `NavigationStack`.
 
-#### `DiscoverView.swift`
+#### `HomeView.swift`
 
 ScrollView with sections:
 1. **"Local Stations"** — horizontal carousel of `StationCardView` (auto-detected country)
@@ -1034,7 +1034,7 @@ Full-screen sheet:
 │                                                  │
 │         Codec: MP3  ·  Bitrate: 128 kbps         │
 │         Last checked: 2 hours ago ✅              │
-│         Radio Browser: radio-browser.info/#/byuuid/… →│
+│         Radio Browser: radio-browser.info/history/… → │
 │         Website: station.example.com →           │
 │                                                  │
 └──────────────────────────────────────────────────┘
@@ -1193,10 +1193,10 @@ struct LibreRadioApp: App {
 6. `ClickResponse.swift`, `VoteResponse.swift`
 7. `ServerDiscoveryService.swift` with DNS resolution + UserDefaults cache
 8. `RadioBrowserService.swift` with `fetchTopByClicks`, `fetchTopByVotes`, `trackClick`
-9. `DiscoverViewModel.swift` (top clicks + top votes only)
+9. `HomeViewModel.swift` (top clicks + top votes only)
 10. `StationRowView.swift` (basic, no swipe actions yet)
-11. `DiscoverView.swift` (vertical lists, no carousel yet)
-12. `RootTabView.swift` with Discover tab only
+11. `HomeView.swift` (vertical lists, no carousel yet)
+12. `RootTabView.swift` with Home tab only
 13. `LibreRadioApp.swift` with server discovery on launch
 
 **Verify:** App launches, resolves API server, fetches top stations, displays them in a list.
@@ -1279,9 +1279,9 @@ struct LibreRadioApp: App {
 - **`await` inside `XCTAssertEqual` autoclosures causes compiler errors** — must extract the async result to a local variable first, then assert on it.
 - **`RecentStationsView` reuses `StationRowView`** with `subtitle: entry.playedAt.relativeDescription` to show relative timestamps instead of tags. `HistoryEntry` is converted to `StationDTO` via `toStationDTO()`. This gives Recent rows context menu, long-press, and swipe-to-favorite actions for free.
 
-**Implementation notes (Discover — Favorites & Recents sections):**
-- **Duplicate `StationDTO.id` in ForEach:** `HistoryEntry` has a unique `id: UUID`, but `toStationDTO()` produces a `StationDTO` whose `id` is `stationuuid`. If the same station appears multiple times in history (played >30 min apart), the carousel's `ForEach` gets duplicate IDs, causing SwiftUI rendering bugs (missing images, skipped views). Fix: deduplicate by `stationuuid` when converting history entries to `StationDTO` in `DiscoverViewModel.loadLocalData()`. This is a general pitfall whenever converting `HistoryEntry` arrays to `[StationDTO]` for use in `ForEach` — always deduplicate first.
-- **Favorites and recents load from local storage** (no network needed), so they appear immediately before API data arrives. This gives the Discover screen instant content even on slow connections.
+**Implementation notes (Home — Favorites & Recents sections):**
+- **Duplicate `StationDTO.id` in ForEach:** `HistoryEntry` has a unique `id: UUID`, but `toStationDTO()` produces a `StationDTO` whose `id` is `stationuuid`. If the same station appears multiple times in history (played >30 min apart), the carousel's `ForEach` gets duplicate IDs, causing SwiftUI rendering bugs (missing images, skipped views). Fix: deduplicate by `stationuuid` when converting history entries to `StationDTO` in `HomeViewModel.loadLocalData()`. This is a general pitfall whenever converting `HistoryEntry` arrays to `[StationDTO]` for use in `ForEach` — always deduplicate first.
+- **Favorites and recents load from local storage** (no network needed), so they appear immediately before API data arrives. This gives the Home screen instant content even on slow connections.
 - **Recents exclude favorites:** After building the deduplicated recents list, stations whose `stationuuid` appears in the favorites set are removed. This prevents a station from appearing in both the Favorites and Recently Played carousels. The Recently Played section is already hidden by the view when the list is empty, so no view changes are needed.
 
 **Implementation notes (Build Fix):**
@@ -1301,7 +1301,7 @@ struct LibreRadioApp: App {
 7. `StationDetailView.swift` (metadata sheet)
 8. `StationCardView.swift` for carousel
 9. `StationCarouselView.swift`
-10. Update `DiscoverView` to use carousel layout
+10. Update `HomeView` to use carousel layout
 11. `SearchFiltersView.swift` with filter chips
 12. Update MiniPlayerView with favicon and loading spinner
 13. Update NowPlayingService to fetch and display favicon as artwork
@@ -1339,7 +1339,7 @@ struct LibreRadioApp: App {
 3. `RadioBrowserServiceTests.swift` (endpoint URL construction, decoding, error handling)
 4. `AudioPlayerServiceTests.swift` (state transitions)
 5. `SearchViewModelTests.swift` (debounce, pagination, filters)
-6. `DiscoverViewModelTests.swift` (concurrent loading)
+6. `HomeViewModelTests.swift` (concurrent loading)
 7. `FavoritesViewModelTests.swift` (add/remove/reorder/sync)
 8. UI tests for critical flows: search → play, browse → play, favorite toggle
 9. Physical device testing: background audio, AirPlay, interruptions
