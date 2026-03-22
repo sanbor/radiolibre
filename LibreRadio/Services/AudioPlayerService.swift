@@ -255,6 +255,7 @@ final class AudioPlayerService: ObservableObject {
     // MARK: - Route Change Handling
 
     private func setupRouteDetector() {
+        #if !targetEnvironment(simulator)
         routeDetector.isRouteDetectionEnabled = true
         hasExternalRoutes = routeDetector.multipleRoutesDetected
         routeDetectorObservation = routeDetector.observe(\.multipleRoutesDetected, options: [.new]) { [weak self] _, change in
@@ -262,6 +263,7 @@ final class AudioPlayerService: ObservableObject {
                 self?.hasExternalRoutes = change.newValue ?? false
             }
         }
+        #endif
     }
 
     private func setupRouteChangeObserver() {

@@ -6,22 +6,23 @@ struct StationCarouselView: View {
     let onStationTap: (StationDTO) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 10) {
             Text(title)
-                .font(.headline)
-                .padding(.horizontal)
+                .font(.title2.bold())
+                .padding(.horizontal, 20)
 
             ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(spacing: 16) {
+                LazyHStack(spacing: 12) {
                     ForEach(stations) { station in
                         StationCardView(station: station) {
                             onStationTap(station)
                         }
                     }
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 20)
             }
         }
-        .padding(.vertical, 12)
+        .padding(.top, 8)
+        .padding(.bottom, 4)
     }
 }

@@ -6,11 +6,11 @@ struct StationCardView: View {
 
     var body: some View {
         Button(action: onTap) {
-            VStack(spacing: 10) {
-                FaviconImageView(url: station.faviconURL, size: 64)
+            VStack(spacing: 8) {
+                FaviconImageView(url: station.faviconURL, size: 80)
 
                 Text(station.name)
-                    .font(.caption)
+                    .font(.subheadline)
                     .fontWeight(.medium)
                     .lineLimit(2, reservesSpace: true)
                     .multilineTextAlignment(.center)
@@ -19,24 +19,24 @@ struct StationCardView: View {
                 if let locationLabel = station.locationLabel {
                     HStack(spacing: 2) {
                         if let flag = station.flagEmoji {
-                            Text(flag).font(.caption2)
+                            Text(flag).font(.caption)
                         }
                         Text(locationLabel)
-                            .font(.caption2)
+                            .font(.caption)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                     }
                 } else {
                     Text(" ")
-                        .font(.caption2)
+                        .font(.caption)
                         .hidden()
                 }
             }
-            .frame(width: 130)
-            .padding(.vertical, 14)
-            .padding(.horizontal, 10)
+            .frame(width: 160)
+            .padding(.vertical, 12)
+            .padding(.horizontal, 12)
             .background(Color(.systemGray6))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)

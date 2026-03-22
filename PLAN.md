@@ -1395,6 +1395,20 @@ struct LibreRadioApp: App {
 
 **Verify:** `xcodegen generate` succeeds, `xcodebuild build` succeeds, all 326 tests pass. Manual: only Live Activity on lock screen, no duplicates, play resumes after stop, country location displays correctly, buttons work on iOS 17+, favicon appears in lock screen and Dynamic Island.
 
+### Post-Phase: Apple Music-style Home Redesign
+
+**Goal:** Make the Home section visually closer to Apple Music — larger typography, tighter spacing, bigger station cards, and fluid edge-to-edge layout.
+
+**Changes:**
+1. `HomeView.swift` — Replaced `List(.insetGrouped)` with `ScrollView` + `LazyVStack(spacing: 8)`. Removes grouped card backgrounds and excess spacing. Vertical sections ("Recently Changed", "Now Playing") are wrapped in rounded `Color(.systemGray6)` containers with dividers between rows.
+2. `StationCarouselView.swift` — Section title font changed from `.headline` to `.title2.bold()`. Horizontal padding increased to 20pt. Card spacing reduced from 16pt to 12pt. Vertical padding tightened.
+3. `StationCardView.swift` — Card width increased from 130pt to 160pt. Favicon size from 64pt to 80pt. Name font from `.caption` to `.subheadline`. Location font from `.caption2` to `.caption`. Corner radius from 12pt to 14pt.
+
+**Implementation notes (Home Redesign):**
+- **`AVRouteDetector` KVO crashes in the iOS Simulator.** `AudioPlayerService.setupRouteDetector()` uses KVO to observe `AVRouteDetector.multipleRoutesDetected`. This crashes on Simulator launch with a `getNonNullSrcObject` fatal error. Fixed by wrapping the route detector setup in `#if !targetEnvironment(simulator)`. Route detection is only meaningful on physical devices (AirPlay, Bluetooth speakers), so this has no functional impact.
+- **`ScrollView` + `.refreshable` works on iOS 16+.** No issues replacing `List` with `ScrollView` for pull-to-refresh behavior.
+- **Vertical sections in ScrollView need explicit styling.** Unlike `List(.insetGrouped)` which automatically provides grouped card backgrounds, `ScrollView` requires manual `Color(.systemGray6)` background + `RoundedRectangle` clipping on vertical sections.
+
 ---
 
 ## Post-MVP Roadmap
