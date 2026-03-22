@@ -686,7 +686,14 @@ final class NowPlayingService {
     // the enhanced lock screen experience.
 
     func clearNowPlaying()
-    // Clears MPNowPlayingInfoCenter.default().nowPlayingInfo
+    // Clears MPNowPlayingInfoCenter.default().nowPlayingInfo and currentStationId
+
+    func stopNowPlaying()
+    // Sets playbackRate to 0 but preserves all metadata (station name, artwork, track info).
+    // Called by AudioPlayerService.stop() so lock screen retains station info after stop.
+
+    // handleLikeCommand() falls back to audioService.lastPlayedStation when currentStation
+    // is nil (after stop), so the like/star button works on the lock screen even when stopped.
 }
 ```
 

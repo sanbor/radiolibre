@@ -58,6 +58,12 @@ final class NowPlayingService {
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
     }
 
+    func stopNowPlaying() {
+        var info = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
+        info[MPNowPlayingInfoPropertyPlaybackRate] = 0.0
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = info
+    }
+
     func updateLikeCommandState(stationuuid: String) {
         guard stationuuid == currentStationId else { return }
         let isFavorite = favoritesViewModel?.isFavorite(stationuuid: stationuuid) ?? false
@@ -159,7 +165,7 @@ final class NowPlayingService {
     }
 
     private func handleLikeCommand() {
-        guard let station = audioService?.currentStation,
+        guard let station = audioService?.currentStation ?? audioService?.lastPlayedStation,
               let favoritesVM = favoritesViewModel else { return }
 
         Task {

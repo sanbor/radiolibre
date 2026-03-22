@@ -119,6 +119,46 @@ final class NowPlayingServiceTests: XCTestCase {
         XCTAssertNil(MPNowPlayingInfoCenter.default().nowPlayingInfo)
     }
 
+    // MARK: - stopNowPlaying
+
+    func testStopNowPlayingPreservesInfo() {
+        let station = StationDTOTests.makeStation(name: "Jazz FM")
+        service.updateNowPlaying(station: station, isPlaying: true)
+
+        service.stopNowPlaying()
+
+        let info = MPNowPlayingInfoCenter.default().nowPlayingInfo
+        XCTAssertNotNil(info)
+        XCTAssertEqual(info?[MPMediaItemPropertyTitle] as? String, "Jazz FM")
+        XCTAssertEqual(info?[MPNowPlayingInfoPropertyPlaybackRate] as? Double, 0.0)
+        XCTAssertEqual(info?[MPNowPlayingInfoPropertyIsLiveStream] as? Bool, true)
+    }
+
+    func testStopNowPlayingPreservesArtist() {
+        let station = StationDTOTests.makeStation(name: "Jazz FM", countrycode: "NL", codec: "MP3", bitrate: 128)
+        service.updateNowPlaying(station: station, isPlaying: true)
+
+        service.stopNowPlaying()
+
+        let info = MPNowPlayingInfoCenter.default().nowPlayingInfo
+        let artist = info?[MPMediaItemPropertyArtist] as? String
+        XCTAssertNotNil(artist)
+        XCTAssertEqual(artist, "NL \u{00B7} MP3 128k")
+    }
+
+    func testStopNowPlayingPreservesStreamMetadata() {
+        let station = StationDTOTests.makeStation(name: "Jazz FM")
+        service.updateNowPlaying(station: station, isPlaying: true)
+        service.updateStreamMetadata(title: "Somewhere Only We Know", artist: "KEANE", station: station)
+
+        service.stopNowPlaying()
+
+        let info = MPNowPlayingInfoCenter.default().nowPlayingInfo
+        XCTAssertEqual(info?[MPMediaItemPropertyTitle] as? String, "Somewhere Only We Know")
+        XCTAssertEqual(info?[MPMediaItemPropertyArtist] as? String, "KEANE")
+        XCTAssertEqual(info?[MPNowPlayingInfoPropertyPlaybackRate] as? Double, 0.0)
+    }
+
     // MARK: - Remote Commands
 
     func testRemoteCommandsEnabled() {

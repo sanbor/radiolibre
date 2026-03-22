@@ -169,7 +169,7 @@ Three navigation links: Countries, Languages, Tags.
 
 **Countries:** sorted alphabetically ascending by display name (derived from ISO code via `Locale`). Each row shows flag emoji (derived from ISO code), country display name, station count. Locally searchable. Tapping → station list for that country. Note: flag emojis do not render properly in the iOS Simulator; test on a physical device to verify flag display.
 
-**Languages:** sorted by station count descending. Each row shows language name, station count. Tapping → station list for that language.
+**Languages:** sorted by station count descending. Each row shows language name, station count. Tapping → station list for that language. Languages are filtered to exclude junk entries from the API: names must start with a Unicode letter (after trimming whitespace) and have at least 1 station. This removes entries starting with `#`, `+`, digits, or other symbols.
 
 **Tags:** sorted by station count descending. Each row shows tag name, station count. Tapping → station list for that tag.
 
@@ -252,7 +252,7 @@ Automatic record of played stations, shown in the **Recent** tab.
 | Play station | Buffer stream → start playback → update Live Activity → track click. Records `lastPlayedStation` for resume after stop. |
 | Pause | Stop streaming (live radio, so pause = stop) |
 | Resume | Reconnect to live stream (equivalent to re-play). Falls back to `lastPlayedStation` when `currentStation` is nil (after stop). |
-| Stop | Return to idle, clear everything. `lastPlayedStation` is preserved for later resume. |
+| Stop | Return to idle. `lastPlayedStation` is preserved for later resume. Lock screen/Control Center retains station name, artwork, track metadata, and like button (with `playbackRate = 0` so play button is shown). |
 | Toggle | Pause if playing, resume if paused. From idle: replays `lastPlayedStation` if available. |
 
 ### Stream Buffering
@@ -339,6 +339,7 @@ Remote commands still work via `MPRemoteCommandCenter` (command routing is based
 | Toggle play/pause | Toggle |
 | Next track | Play next favorite |
 | Previous track | Play previous favorite |
+| Like | Toggle favorite. Works when stopped (uses `lastPlayedStation` as fallback). |
 
 ---
 

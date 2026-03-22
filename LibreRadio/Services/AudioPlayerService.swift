@@ -187,7 +187,7 @@ final class AudioPlayerService: ObservableObject {
         currentTrackTitle = nil
         currentArtist = nil
         state = .idle
-        nowPlayingService.clearNowPlaying()
+        nowPlayingService.stopNowPlaying()
     }
 
     func togglePlayPause() {
