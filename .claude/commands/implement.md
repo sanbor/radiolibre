@@ -5,7 +5,7 @@ argument-hint: <feature-or-area>
 
 You are implementing a feature for the LibreRadio iOS app. The user has requested: **$ARGUMENTS**
 
-Follow these 13 steps in order. Do not skip steps.
+Follow these 14 steps in order. Do not skip steps. Track which steps you complete, skip, or partially complete — you will report on this in Step 14.
 
 ---
 
@@ -198,12 +198,47 @@ Re-read `SPEC.md`, `PLAN.md`, and `CHANGELOG.md` in full. Verify they are mutual
 
 ---
 
-## Step 13: Draft Commit Message
+## Step 13: Update .gitmessage
 
-Draft a commit message for the user to review before committing. Do not commit automatically.
+Append to the `.gitmessage` file in the project root. This file accumulates commit notes across multiple `/implement` sessions so the user can commit many features at once. **Do not commit automatically.**
 
-1. Run `git diff` to review all changes made during this implementation.
-2. Write a commit message following conventional commit style:
-   - **Subject line:** concise summary of what was built (under 70 characters)
-   - **Body:** bullet list of key changes — files created, features added, tests written
-3. Present the draft commit message to the user and ask if they'd like to commit with it, edit it, or skip.
+1. Run `git diff --stat` to review all changes made during this implementation.
+2. Read the existing `.gitmessage` file if it exists. If it does not exist, create it.
+3. **Append** a new section to `.gitmessage` — never remove or modify existing content. Use this format:
+
+```
+# --- /implement $ARGUMENTS (YYYY-MM-DD) ---
+<subject line: concise summary, under 70 characters>
+
+- Bullet list of key changes: files created, features added, tests written
+- Notable decisions or deviations from the spec/plan
+```
+
+4. **Show a summary** of the full `.gitmessage` file to the user, including all accumulated sections from previous sessions. Format it clearly so the user can see everything that will go into the next commit.
+5. Remind the user: *"When you're ready to commit, you can use the contents of `.gitmessage` as your commit message, or edit it first. Run `git commit -F .gitmessage` to use it directly."*
+
+---
+
+## Step 14: Step Status Report
+
+Display a summary table showing the status of every step in this skill. This gives the user a clear picture of what was done, what was skipped, and what might need another pass.
+
+For each step (1–13), report one of these statuses:
+- **Done** — Step was fully completed
+- **Skipped** — Step was not executed (explain why briefly)
+- **Partial** — Step was started but not fully completed (explain what remains)
+- **Needs redo** — Step was done but subsequent changes may have invalidated it (e.g., code review found issues that were fixed, meaning tests should be re-run)
+
+Format as a table:
+
+```
+| Step | Name                  | Status     | Notes                          |
+|------|-----------------------|------------|--------------------------------|
+| 1    | Understand            | Done       |                                |
+| 2    | Plan                  | Done       |                                |
+| ...  | ...                   | ...        | ...                            |
+```
+
+After the table, add:
+- **Recommendations** — If any steps should be re-run (e.g., "Re-run Step 5 after the fixes made in Step 10"), list them explicitly.
+- **Ready to commit?** — Based on step statuses, give a clear yes/no on whether the changeset is in a committable state. If not, explain what needs to happen first.
