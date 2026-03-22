@@ -49,23 +49,18 @@ struct FullPlayerView: View {
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
 
-            // Country / Language
-            if station.countryDisplayName != nil || station.language != nil {
+            // Country / Subdivision
+            if let country = station.countryDisplayName, !country.isEmpty {
                 HStack(spacing: 8) {
                     if let flag = station.flagEmoji {
                         Text(flag)
                     }
-                    if let country = station.countryDisplayName, !country.isEmpty {
-                        Text(country)
+                    if let state = station.state, !state.isEmpty {
+                        Text("\(country), \(state)")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-                    }
-                    if station.countryDisplayName != nil && station.language != nil {
-                        Text("·")
-                            .foregroundStyle(.secondary)
-                    }
-                    if let language = station.language, !language.isEmpty {
-                        Text(language.capitalized)
+                    } else {
+                        Text(country)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }

@@ -376,7 +376,7 @@ Sheet presented from the mini player.
 
 Shows:
 - Large favicon (120×120)
-- Station name, full country name, language
+- Station name, flag emoji + full country name + subdivision (e.g. "🇳🇱 Netherlands, Amsterdam"; without subdivision: "🇳🇱 Netherlands")
 - Previous / play-pause / next buttons
 - Volume slider
 - AirPlay button (system route picker)

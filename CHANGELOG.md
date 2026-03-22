@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-03-22 — Show country + subdivision in full player
+
+**Prompt:** `/implement show {country flag} {country full name} {countrysubdivision}. For example 🇳🇱 Netherlands, Amsterdam. If there is no countrysubdivision, just show 🇳🇱 Netherlands`
+
+**Changes:**
+- Changed full player country/language section to show flag + full country name + subdivision (e.g. "🇦🇷 Argentina, Buenos Aires") instead of flag + country + language
+- If no subdivision is available, shows just flag + country name (e.g. "🇳🇱 Netherlands")
+- Language is no longer displayed in the full player location line
+- Modified `FullPlayerView.swift` only — no model changes needed
+
 ## 2026-03-22 — Fix language sorting by name with diacritics and overflow
 
 **Prompt:** `/implement fix sorting by name in the language section. there was a previous attempt to fix it already`
