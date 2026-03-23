@@ -67,8 +67,7 @@ struct FavoriteStation: Codable, Identifiable, Hashable, Sendable {
     }
 
     var tagList: [String] {
-        guard let tags, !tags.isEmpty else { return [] }
-        return tags.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+        tags?.asTagList ?? []
     }
 
     func toStationDTO() -> StationDTO {

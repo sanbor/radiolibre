@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-03-23 — Technical review: fix convention violations and code quality issues
+
+**Prompt:** `/implement perform a general technical review of code and architecture and recommendations of things to improve`
+
+**Changes:**
+- Removed Combine dependency from `PlayerViewModel` — replaced `AnyCancellable` sink with a polling `Task` that monitors AudioPlayerService state changes every 100ms, eliminating the only Combine usage in the project
+- Replaced `withCheckedThrowingContinuation` bridging in `RadioBrowserService.performRequest()` with native `URLSession.data(from:)` async API (available iOS 15+)
+- Eliminated force unwraps: consolidated `ServerDiscoveryService` fallback URL into a single `static let`, replaced `ImageCacheService` init `first!` with `guard let` + `fatalError`, replaced `FullPlayerView` URL force unwrap with conditional `if let`
+- Improved `NowPlayingService` remote command handlers to return `.noActionableNowPlayingItem` when weak references are nil instead of silently returning `.success`
+- Extracted duplicate tag parsing logic from `StationDTO` and `FavoriteStation` into shared `String.asTagList` extension (`String+TagList.swift`)
+- Improved `HomeViewModel` error mapping — now distinguishes `URLError` codes instead of mapping all unknown errors to `.networkUnavailable`
+- Extracted magic numbers in `LiveActivityService` (`staleInterval`) and `ImageCacheService` (`memoryCacheLimit`) to named constants
+- Added technical review implementation notes to `PLAN.md` documenting findings, fixes, and remaining recommendations
+
 ## 2026-03-22 — Revert alphabet index to simple direct-mapping scroll
 
 **Prompt:** `/implement recently there was an improvement to the alphabet index for sorted lists in browse section. the alphabet functionality is too hard to use because scrolling through the list is very cumbersome. I like the idea of having alphabet + numbers + # symbol for everything else. Go back to the old way of scrolling though the index list`

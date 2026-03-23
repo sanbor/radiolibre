@@ -248,18 +248,7 @@ actor RadioBrowserService {
             throw AppError.networkUnavailable
         }
 
-        let (data, response) = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(Data, URLResponse), Error>) in
-            let task = session.dataTask(with: url) { data, response, error in
-                if let error {
-                    continuation.resume(throwing: error)
-                } else if let data, let response {
-                    continuation.resume(returning: (data, response))
-                } else {
-                    continuation.resume(throwing: AppError.networkUnavailable)
-                }
-            }
-            task.resume()
-        }
+        let (data, response) = try await session.data(from: url)
 
         if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
             throw AppError.serverError(statusCode: httpResponse.statusCode)

@@ -6,6 +6,8 @@ import UIKit
 final class LiveActivityService {
     static let shared = LiveActivityService()
 
+    private static let staleInterval: TimeInterval = 15 * 60
+
     private var currentActivity: (any AnyLiveActivity)?
     private var currentFaviconData: Data?
     private var currentStationId: String?
@@ -103,21 +105,21 @@ final class LiveActivityService {
         if let activity = currentActivity as? Activity<RadioActivityAttributes> {
             Task {
                 await activity.update(
-                    ActivityContent(state: state, staleDate: Date().addingTimeInterval(15 * 60))
+                    ActivityContent(state: state, staleDate: Date().addingTimeInterval(Self.staleInterval))
                 )
             }
         } else if let existing = Activity<RadioActivityAttributes>.activities.first {
             currentActivity = existing
             Task {
                 await existing.update(
-                    ActivityContent(state: state, staleDate: Date().addingTimeInterval(15 * 60))
+                    ActivityContent(state: state, staleDate: Date().addingTimeInterval(Self.staleInterval))
                 )
             }
         } else {
             do {
                 let activity = try Activity.request(
                     attributes: RadioActivityAttributes(),
-                    content: ActivityContent(state: state, staleDate: Date().addingTimeInterval(15 * 60)),
+                    content: ActivityContent(state: state, staleDate: Date().addingTimeInterval(Self.staleInterval)),
                     pushType: nil
                 )
                 currentActivity = activity

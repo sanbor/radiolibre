@@ -117,48 +117,56 @@ final class NowPlayingService {
 
         center.playCommand.isEnabled = true
         center.playCommand.addTarget { [weak self] _ in
-            self?.audioService?.resume()
+            guard let self, self.audioService != nil else { return .noActionableNowPlayingItem }
+            self.audioService?.resume()
             return .success
         }
 
         center.pauseCommand.isEnabled = true
         center.pauseCommand.addTarget { [weak self] _ in
-            self?.audioService?.pause()
+            guard let self, self.audioService != nil else { return .noActionableNowPlayingItem }
+            self.audioService?.pause()
             return .success
         }
 
         center.stopCommand.isEnabled = true
         center.stopCommand.addTarget { [weak self] _ in
-            self?.audioService?.stop()
+            guard let self, self.audioService != nil else { return .noActionableNowPlayingItem }
+            self.audioService?.stop()
             return .success
         }
 
         center.togglePlayPauseCommand.isEnabled = true
         center.togglePlayPauseCommand.addTarget { [weak self] _ in
-            self?.audioService?.togglePlayPause()
+            guard let self, self.audioService != nil else { return .noActionableNowPlayingItem }
+            self.audioService?.togglePlayPause()
             return .success
         }
 
         center.nextTrackCommand.isEnabled = true
         center.nextTrackCommand.addTarget { [weak self] _ in
+            guard let self, self.playerViewModel != nil else { return .noActionableNowPlayingItem }
+            // Must return synchronously; MPRemoteCommandCenter requires it.
             Task { @MainActor in
-                await self?.playerViewModel?.playNext()
+                await self.playerViewModel?.playNext()
             }
             return .success
         }
 
         center.previousTrackCommand.isEnabled = true
         center.previousTrackCommand.addTarget { [weak self] _ in
+            guard let self, self.playerViewModel != nil else { return .noActionableNowPlayingItem }
             Task { @MainActor in
-                await self?.playerViewModel?.playPrevious()
+                await self.playerViewModel?.playPrevious()
             }
             return .success
         }
 
         center.likeCommand.isEnabled = true
         center.likeCommand.addTarget { [weak self] _ in
+            guard let self else { return .noActionableNowPlayingItem }
             Task { @MainActor in
-                self?.handleLikeCommand()
+                self.handleLikeCommand()
             }
             return .success
         }

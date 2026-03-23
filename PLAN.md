@@ -1416,6 +1416,20 @@ struct LibreRadioApp: App {
 - **`ScrollView` + `.refreshable` works on iOS 16+.** No issues replacing `List` with `ScrollView` for pull-to-refresh behavior.
 - **Vertical sections in ScrollView need explicit styling.** Unlike `List(.insetGrouped)` which automatically provides grouped card backgrounds, `ScrollView` requires manual `Color(.systemGray6)` background + `RoundedRectangle` clipping on vertical sections.
 
+### Technical Review (2026-03-23)
+
+**Goal:** Comprehensive code and architecture review with targeted fixes for convention violations, safety issues, and code quality.
+
+**Implementation notes (Technical Review):**
+- **Combine usage in PlayerViewModel was the only convention violation.** Replaced `AnyCancellable` sink with a polling `Task` that checks AudioPlayerService's `@Published` properties every 100ms and calls `objectWillChange.send()` on change. This is the cleanest iOS 16-compatible approach without importing Combine. The 100ms interval is imperceptible for audio UI. Views that access `audioService.hasExternalRoutes` directly are unaffected because they reference the AudioPlayerService, not forwarded properties.
+- **`RadioBrowserService.performRequest()` used `withCheckedThrowingContinuation` unnecessarily.** The app targets iOS 16+ where `URLSession.data(from:)` is natively available (since iOS 15). Replaced 12 lines of continuation bridging with a single native async call. This also gains automatic cooperative cancellation for free.
+- **Force unwraps were scattered but low-risk.** `ServerDiscoveryService` had two identical force unwraps of the same static URL string — consolidated into a `private static let fallbackURL` constant (single force unwrap of a compile-time-verifiable literal is acceptable). `ImageCacheService` init used `first!` on the caches directory — replaced with `guard let` + `fatalError` for intentional crash with descriptive message. `FullPlayerView` had a force unwrap on a URL constructed from user-supplied station UUID — replaced with `if let` to conditionally render the Link.
+- **NowPlayingService remote command handlers returned `.success` even when `self` was nil.** Now return `.noActionableNowPlayingItem` when the weak reference to audioService or playerViewModel has been cleared. The async next/previous/like commands still return `.success` synchronously (required by MPRemoteCommandCenter), but the guard ensures the fire-and-forget Task will actually have a target.
+- **Duplicate tag parsing in StationDTO and FavoriteStation** extracted to `String.asTagList` extension (`String+TagList.swift`). Both models now delegate to `tags?.asTagList ?? []`.
+- **HomeViewModel caught all non-AppError exceptions as `.networkUnavailable`.** Now distinguishes `URLError` codes (`.notConnectedToInternet`, `.timedOut`, etc.) for more accurate error messages. Unknown errors map to `.serverError(statusCode: 0)` rather than falsely claiming no internet.
+- **FavoritesService.syncWithServer() race condition was investigated and found safe.** Actor isolation serializes concurrent calls. The `await` suspension point does not allow interleaving within the same actor. No code change needed.
+- **Magic numbers extracted:** `LiveActivityService.staleInterval` (was inline `15 * 60`), `ImageCacheService.memoryCacheLimit` (was inline `200`).
+
 ---
 
 ## Post-MVP Roadmap

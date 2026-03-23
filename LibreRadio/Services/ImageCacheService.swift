@@ -4,9 +4,11 @@ import UIKit
 actor ImageCacheService {
     static let shared = ImageCacheService()
 
+    private static let memoryCacheLimit = 200
+
     nonisolated(unsafe) private let memoryCache: NSCache<NSString, UIImage> = {
         let cache = NSCache<NSString, UIImage>()
-        cache.countLimit = 200
+        cache.countLimit = memoryCacheLimit
         return cache
     }()
 
@@ -19,9 +21,14 @@ actor ImageCacheService {
         cacheDirectory: URL? = nil
     ) {
         self.session = session
-        self.cacheDirectory = cacheDirectory ?? FileManager.default.urls(
-            for: .cachesDirectory, in: .userDomainMask
-        ).first!.appendingPathComponent("favicons", isDirectory: true)
+        if let cacheDirectory {
+            self.cacheDirectory = cacheDirectory
+        } else {
+            guard let cachesDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first else {
+                fatalError("ImageCacheService: system caches directory unavailable")
+            }
+            self.cacheDirectory = cachesDir.appendingPathComponent("favicons", isDirectory: true)
+        }
     }
 
     // MARK: - Public API

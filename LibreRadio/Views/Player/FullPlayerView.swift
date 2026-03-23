@@ -153,9 +153,11 @@ struct FullPlayerView: View {
             }
 
             // Radio Browser link
-            Link(destination: URL(string: "https://www.radio-browser.info/history/\(station.stationuuid)")!) {
-                Label("Radio Browser", systemImage: "antenna.radiowaves.left.and.right")
-                    .font(.subheadline)
+            if let radioBrowserURL = URL(string: "https://www.radio-browser.info/history/\(station.stationuuid)") {
+                Link(destination: radioBrowserURL) {
+                    Label("Radio Browser", systemImage: "antenna.radiowaves.left.and.right")
+                        .font(.subheadline)
+                }
             }
 
             Spacer(minLength: 20)

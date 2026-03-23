@@ -3,6 +3,9 @@ import Foundation
 actor ServerDiscoveryService {
     static let shared = ServerDiscoveryService()
 
+    // swiftlint:disable:next force_unwrapping
+    private static let fallbackURL = URL(string: "https://de1.api.radio-browser.info")!
+
     private var servers: [String] = []
     private var currentIndex: Int = 0
     private var lastResolved: Date?
@@ -24,11 +27,11 @@ actor ServerDiscoveryService {
 
     var currentBaseURL: URL {
         guard !servers.isEmpty else {
-            return URL(string: "https://de1.api.radio-browser.info")!
+            return Self.fallbackURL
         }
         let host = servers[currentIndex % servers.count]
         guard let url = URL(string: "https://\(host)") else {
-            return URL(string: "https://de1.api.radio-browser.info")!
+            return Self.fallbackURL
         }
         return url
     }

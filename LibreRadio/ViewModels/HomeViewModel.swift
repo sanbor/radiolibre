@@ -80,8 +80,19 @@ final class HomeViewModel: ObservableObject {
             await cache.save(key: StationCacheService.homeCurrentlyPlaying, value: currentlyPlaying)
         } catch let appError as AppError {
             if !hasCache { error = appError }
+        } catch let urlError as URLError {
+            if !hasCache {
+                switch urlError.code {
+                case .notConnectedToInternet, .networkConnectionLost, .dataNotAllowed:
+                    self.error = .networkUnavailable
+                case .timedOut:
+                    self.error = .serverError(statusCode: 408)
+                default:
+                    self.error = .networkUnavailable
+                }
+            }
         } catch {
-            if !hasCache { self.error = .networkUnavailable }
+            if !hasCache { self.error = .serverError(statusCode: 0) }
         }
 
         isLoading = false

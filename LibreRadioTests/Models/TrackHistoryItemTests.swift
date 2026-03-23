@@ -39,8 +39,9 @@ final class TrackHistoryItemTests: XCTestCase {
 
     func testHashable() {
         let id = UUID()
-        let item1 = TrackHistoryItem(id: id, title: "A", artist: "B", stationName: "S", stationUUID: "u")
-        let item2 = TrackHistoryItem(id: id, title: "A", artist: "B", stationName: "S", stationUUID: "u")
+        let timestamp = Date()
+        let item1 = TrackHistoryItem(id: id, title: "A", artist: "B", stationName: "S", stationUUID: "u", timestamp: timestamp)
+        let item2 = TrackHistoryItem(id: id, title: "A", artist: "B", stationName: "S", stationUUID: "u", timestamp: timestamp)
         XCTAssertEqual(item1, item2)
     }
 }
