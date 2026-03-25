@@ -450,6 +450,10 @@ Lookup order:
 
 Memory tier auto-evicts under system memory pressure. Disk tier lives in the system caches directory (may be purged by the OS under storage pressure).
 
+### Favicon Pre-warming
+
+On app startup, after loading cached station data, the memory cache is pre-warmed from disk for all visible stations (favorites, recents, local, top clicks, top votes — bounded to 60 URLs). This eliminates the placeholder-to-image flash that would otherwise occur on every cold launch. Pre-warming runs as a non-blocking background task.
+
 ### Favicon View
 
 Reusable image view: takes an optional URL and a size. Shows an `antenna.radiowaves.left.and.right` icon placeholder while loading or on failure. Clips to rounded rectangle (corner radius = 20% of size). Reloads when URL changes.

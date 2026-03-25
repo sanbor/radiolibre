@@ -149,4 +149,64 @@ final class StationCacheServiceTests: XCTestCase {
         let loaded: [StationDTO]? = await cache.load(key: "corrupted")
         XCTAssertNil(loaded)
     }
+
+    // MARK: - Batch Home Data Loading
+
+    func testLoadHomeDataReturnsAllPopulatedKeys() async {
+        let stations = [TestFixtures.makeStation(uuid: "home-1")]
+        await cache.save(key: StationCacheService.localKey(countryCode: "US"), value: stations)
+        await cache.save(key: StationCacheService.homeTopClicks, value: stations)
+        await cache.save(key: StationCacheService.homeTopVotes, value: stations)
+        await cache.save(key: StationCacheService.homeRecentlyChanged, value: stations)
+        await cache.save(key: StationCacheService.homeCurrentlyPlaying, value: stations)
+
+        let data = await cache.loadHomeData(localCountryCode: "US")
+
+        XCTAssertTrue(data.hasData)
+        XCTAssertEqual(data.local?.count, 1)
+        XCTAssertEqual(data.topClicks?.count, 1)
+        XCTAssertEqual(data.topVotes?.count, 1)
+        XCTAssertEqual(data.recentlyChanged?.count, 1)
+        XCTAssertEqual(data.currentlyPlaying?.count, 1)
+        XCTAssertEqual(data.local?[0].stationuuid, "home-1")
+    }
+
+    func testLoadHomeDataReturnsAllNilsForEmptyCache() async {
+        let data = await cache.loadHomeData(localCountryCode: "US")
+
+        XCTAssertFalse(data.hasData)
+        XCTAssertNil(data.local)
+        XCTAssertNil(data.topClicks)
+        XCTAssertNil(data.topVotes)
+        XCTAssertNil(data.recentlyChanged)
+        XCTAssertNil(data.currentlyPlaying)
+    }
+
+    func testLoadHomeDataWithPartialCache() async {
+        let stations = [TestFixtures.makeStation(uuid: "partial")]
+        await cache.save(key: StationCacheService.homeTopClicks, value: stations)
+        await cache.save(key: StationCacheService.homeTopVotes, value: stations)
+
+        let data = await cache.loadHomeData(localCountryCode: "US")
+
+        XCTAssertTrue(data.hasData)
+        XCTAssertNil(data.local)
+        XCTAssertEqual(data.topClicks?.count, 1)
+        XCTAssertEqual(data.topVotes?.count, 1)
+        XCTAssertNil(data.recentlyChanged)
+        XCTAssertNil(data.currentlyPlaying)
+    }
+
+    func testLoadHomeDataUsesCorrectCountryCode() async {
+        let usStations = [TestFixtures.makeStation(uuid: "us")]
+        let arStations = [TestFixtures.makeStation(uuid: "ar")]
+        await cache.save(key: StationCacheService.localKey(countryCode: "US"), value: usStations)
+        await cache.save(key: StationCacheService.localKey(countryCode: "AR"), value: arStations)
+
+        let usData = await cache.loadHomeData(localCountryCode: "US")
+        let arData = await cache.loadHomeData(localCountryCode: "AR")
+
+        XCTAssertEqual(usData.local?[0].stationuuid, "us")
+        XCTAssertEqual(arData.local?[0].stationuuid, "ar")
+    }
 }

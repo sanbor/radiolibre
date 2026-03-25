@@ -168,4 +168,68 @@ final class ImageCacheServiceTests: XCTestCase {
         let image = await sut.image(for: url)
         XCTAssertNil(image)
     }
+
+    // MARK: - Pre-warm Memory Cache
+
+    func testPreWarmPromotesDiskToMemory() async {
+        let url = URL(string: "https://example.com/warm.png")!
+        let pngData = makeTestPNGData()
+        setMockImageResponse(url: url, data: pngData)
+
+        // Load once to populate disk + memory
+        _ = await sut.image(for: url)
+
+        // Create fresh instance with same disk dir (empty memory cache)
+        MockURLProtocol.requestHandler = nil
+        let sut2 = ImageCacheService(session: TestFixtures.makeMockSession(), cacheDirectory: tempDir)
+
+        // Memory should be empty
+        XCTAssertNil(sut2.cachedImage(for: url))
+
+        // Pre-warm should promote from disk to memory
+        await sut2.preWarmMemoryCache(for: [url])
+        XCTAssertNotNil(sut2.cachedImage(for: url))
+    }
+
+    func testPreWarmSkipsAlreadyCachedURLs() async {
+        let url = URL(string: "https://example.com/already.png")!
+        let pngData = makeTestPNGData()
+        setMockImageResponse(url: url, data: pngData)
+
+        // Load once — now in memory + disk
+        _ = await sut.image(for: url)
+        XCTAssertNotNil(sut.cachedImage(for: url))
+
+        // Pre-warm should succeed without error
+        await sut.preWarmMemoryCache(for: [url])
+        XCTAssertNotNil(sut.cachedImage(for: url))
+    }
+
+    func testPreWarmHandlesMissingDiskFiles() async {
+        let url = URL(string: "https://example.com/missing.png")!
+
+        // No image on disk — should not crash
+        await sut.preWarmMemoryCache(for: [url])
+        XCTAssertNil(sut.cachedImage(for: url))
+    }
+
+    func testPreWarmMultipleURLs() async {
+        let url1 = URL(string: "https://example.com/multi1.png")!
+        let url2 = URL(string: "https://example.com/multi2.png")!
+        let pngData = makeTestPNGData()
+
+        // Load both to populate disk
+        setMockImageResponse(url: url1, data: pngData)
+        _ = await sut.image(for: url1)
+        setMockImageResponse(url: url2, data: pngData)
+        _ = await sut.image(for: url2)
+
+        // Create fresh instance
+        MockURLProtocol.requestHandler = nil
+        let sut2 = ImageCacheService(session: TestFixtures.makeMockSession(), cacheDirectory: tempDir)
+
+        await sut2.preWarmMemoryCache(for: [url1, url2])
+        XCTAssertNotNil(sut2.cachedImage(for: url1))
+        XCTAssertNotNil(sut2.cachedImage(for: url2))
+    }
 }

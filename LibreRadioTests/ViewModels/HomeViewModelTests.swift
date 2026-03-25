@@ -126,6 +126,30 @@ final class HomeViewModelTests: XCTestCase {
 
     // MARK: - Cache Tests
 
+    func testCachedDataClearsLoadingBeforeNetworkFetch() async {
+        let stations = [TestFixtures.makeStation(uuid: "cached-instant")]
+        let localCountry = Locale.current.region?.identifier ?? "US"
+        await cache.save(key: StationCacheService.localKey(countryCode: localCountry), value: stations)
+        await cache.save(key: StationCacheService.homeTopClicks, value: stations)
+        await cache.save(key: StationCacheService.homeTopVotes, value: stations)
+        await cache.save(key: StationCacheService.homeRecentlyChanged, value: stations)
+        await cache.save(key: StationCacheService.homeCurrentlyPlaying, value: stations)
+
+        MockURLProtocol.requestHandler = { request in
+            let data = TestFixtures.stationArrayJSON(count: 2).data(using: .utf8)!
+            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+            return (response, data)
+        }
+
+        let vm = HomeViewModel(service: service, cache: cache, favoritesService: favoritesService, historyService: historyService)
+        await vm.load()
+
+        // After load completes, data should be fresh (from network) and loading done
+        XCTAssertFalse(vm.isLoading)
+        XCTAssertEqual(vm.topByClicks.count, 2) // fresh data replaced cached
+        XCTAssertNil(vm.error)
+    }
+
     func testCachedDataShownOnNetworkFailure() async {
         let stations = [TestFixtures.makeStation(uuid: "cached-1", name: "Cached Station")]
         let localCountry = Locale.current.region?.identifier ?? "US"

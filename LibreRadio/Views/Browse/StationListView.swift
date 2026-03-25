@@ -9,19 +9,15 @@ struct StationListView: View {
     }
 
     var body: some View {
-        Group {
-            if viewModel.isLoading && viewModel.stations.isEmpty {
-                LoadingView(message: "Loading stations...")
-            } else if let error = viewModel.error, viewModel.stations.isEmpty {
-                ErrorView(error: error) {
-                    await viewModel.load()
-                }
-            } else if viewModel.stations.isEmpty {
-                emptyView
-            } else {
-                stationList
-            }
-        }
+        AsyncContentView(
+            isLoading: viewModel.isLoading,
+            error: viewModel.error,
+            isEmpty: viewModel.stations.isEmpty,
+            loadingMessage: "Loading stations...",
+            onRetry: { await viewModel.load() },
+            emptyContent: { emptyView },
+            content: { stationList }
+        )
         .navigationTitle(viewModel.title)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {

@@ -6,15 +6,14 @@ struct FavoritesView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
-                if favoritesVM.isLoading && favoritesVM.favorites.isEmpty {
-                    LoadingView(message: "Loading favorites...")
-                } else if favoritesVM.favorites.isEmpty {
-                    emptyState
-                } else {
-                    favoritesList
-                }
-            }
+            AsyncContentView(
+                isLoading: favoritesVM.isLoading,
+                error: nil,
+                isEmpty: favoritesVM.favorites.isEmpty,
+                loadingMessage: "Loading favorites...",
+                emptyContent: { emptyState },
+                content: { favoritesList }
+            )
             .navigationTitle("Favorites")
             .task { await favoritesVM.load() }
             .refreshable { await favoritesVM.refresh() }

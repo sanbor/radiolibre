@@ -1,6 +1,6 @@
 import Foundation
 
-struct HistoryEntry: Codable, Identifiable, Hashable, Sendable {
+struct HistoryEntry: Codable, Identifiable, Hashable, Sendable, StationConvertible {
     let id: UUID
     let stationuuid: String
     let name: String
@@ -54,34 +54,7 @@ struct HistoryEntry: Codable, Identifiable, Hashable, Sendable {
         return "\(bitrate)k"
     }
 
-    func toStationDTO() -> StationDTO {
-        StationDTO(
-            stationuuid: stationuuid,
-            name: name,
-            url: urlResolved,
-            urlResolved: urlResolved,
-            homepage: nil,
-            favicon: faviconURL,
-            tags: nil,
-            country: nil,
-            countrycode: countrycode,
-            state: state,
-            language: nil,
-            languagecodes: nil,
-            codec: codec,
-            bitrate: bitrate,
-            hls: nil,
-            votes: nil,
-            clickcount: nil,
-            clicktrend: nil,
-            lastcheckok: nil,
-            lastcheckoktime: nil,
-            lastcheckoktime_iso8601: nil,
-            geoLat: nil,
-            geoLong: nil,
-            hasExtendedInfo: nil
-        )
-    }
+    // toStationDTO() provided by StationConvertible protocol default implementation.
 }
 
 extension Array where Element == HistoryEntry {

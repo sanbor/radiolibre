@@ -7,15 +7,14 @@ struct RecentStationsView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
-                if viewModel.isLoading && viewModel.entries.isEmpty {
-                    LoadingView(message: "Loading history...")
-                } else if viewModel.entries.isEmpty {
-                    emptyState
-                } else {
-                    stationList
-                }
-            }
+            AsyncContentView(
+                isLoading: viewModel.isLoading,
+                error: nil,
+                isEmpty: viewModel.entries.isEmpty,
+                loadingMessage: "Loading history...",
+                emptyContent: { emptyState },
+                content: { stationList }
+            )
             .navigationTitle("Recent")
             .task { await viewModel.load() }
             .refreshable { await viewModel.refresh() }

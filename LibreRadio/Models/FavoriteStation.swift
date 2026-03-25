@@ -1,6 +1,6 @@
 import Foundation
 
-struct FavoriteStation: Codable, Identifiable, Hashable, Sendable {
+struct FavoriteStation: Codable, Identifiable, Hashable, Sendable, StationConvertible {
     let id: UUID
     let stationuuid: String
     let name: String
@@ -70,32 +70,5 @@ struct FavoriteStation: Codable, Identifiable, Hashable, Sendable {
         tags?.asTagList ?? []
     }
 
-    func toStationDTO() -> StationDTO {
-        StationDTO(
-            stationuuid: stationuuid,
-            name: name,
-            url: urlResolved,
-            urlResolved: urlResolved,
-            homepage: nil,
-            favicon: faviconURL,
-            tags: tags,
-            country: nil,
-            countrycode: countrycode,
-            state: state,
-            language: language,
-            languagecodes: nil,
-            codec: codec,
-            bitrate: bitrate,
-            hls: nil,
-            votes: nil,
-            clickcount: nil,
-            clicktrend: nil,
-            lastcheckok: nil,
-            lastcheckoktime: nil,
-            lastcheckoktime_iso8601: nil,
-            geoLat: nil,
-            geoLong: nil,
-            hasExtendedInfo: nil
-        )
-    }
+    // toStationDTO() provided by StationConvertible protocol default implementation.
 }

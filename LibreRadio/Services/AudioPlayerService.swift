@@ -6,6 +6,14 @@ import Foundation
 final class AudioPlayerService: ObservableObject {
     static let shared = AudioPlayerService()
 
+    // MARK: - Change Notification
+
+    /// AsyncStream that yields whenever observable state changes.
+    /// Replaces Combine-based observation with pure Swift concurrency.
+    /// Single-consumer: only PlayerViewModel should iterate this.
+    let stateChanges: AsyncStream<Void>
+    private let changeContinuation: AsyncStream<Void>.Continuation
+
     // MARK: - Published State
 
     @Published private(set) var state: PlaybackState = .idle
@@ -13,7 +21,10 @@ final class AudioPlayerService: ObservableObject {
     @Published private(set) var currentArtist: String?
     @Published private(set) var trackHistory: [TrackHistoryItem] = []
     @Published var volume: Float = 1.0 {
-        didSet { player.volume = volume }
+        didSet {
+            player.volume = volume
+            notifyStateChange()
+        }
     }
     @Published private(set) var hasExternalRoutes: Bool = false
 
@@ -94,6 +105,9 @@ final class AudioPlayerService: ObservableObject {
         service: RadioBrowserService = .shared,
         nowPlayingService: NowPlayingService? = nil
     ) {
+        let (stream, continuation) = AsyncStream<Void>.makeStream()
+        self.stateChanges = stream
+        self.changeContinuation = continuation
         self.player = player
         self.service = service
         self.nowPlayingService = nowPlayingService ?? NowPlayingService.shared
@@ -105,6 +119,15 @@ final class AudioPlayerService: ObservableObject {
         setupRouteDetector()
     }
 
+    deinit {
+        changeContinuation.finish()
+    }
+
+    /// Notifies observers (PlayerViewModel) that state has changed.
+    private func notifyStateChange() {
+        changeContinuation.yield()
+    }
+
     // MARK: - Public API
 
     func play(station: StationDTO) {
@@ -112,6 +135,7 @@ final class AudioPlayerService: ObservableObject {
 
         guard let streamURL = station.streamURL else {
             state = .error(station: station, message: AppError.streamURLInvalid.errorDescription ?? "Invalid stream URL")
+            notifyStateChange()
             return
         }
 
@@ -151,6 +175,7 @@ final class AudioPlayerService: ObservableObject {
         player.play()
 
         nowPlayingService.updateNowPlaying(station: station, isPlaying: true)
+        notifyStateChange()
 
         // Fire-and-forget click tracking
         Task {
@@ -163,6 +188,7 @@ final class AudioPlayerService: ObservableObject {
         player.pause()
         state = .paused(station: station)
         nowPlayingService.updateNowPlaying(station: station, isPlaying: false)
+        notifyStateChange()
     }
 
     func resume() {
@@ -189,6 +215,7 @@ final class AudioPlayerService: ObservableObject {
         currentArtist = nil
         state = .idle
         nowPlayingService.stopNowPlaying()
+        notifyStateChange()
     }
 
     func togglePlayPause() {
@@ -262,6 +289,7 @@ final class AudioPlayerService: ObservableObject {
         routeDetectorObservation = routeDetector.observe(\.multipleRoutesDetected, options: [.new]) { [weak self] _, change in
             Task { @MainActor [weak self] in
                 self?.hasExternalRoutes = change.newValue ?? false
+                self?.notifyStateChange()
             }
         }
         #endif
@@ -297,9 +325,11 @@ final class AudioPlayerService: ObservableObject {
                 switch player.timeControlStatus {
                 case .waitingToPlayAtSpecifiedRate:
                     self.state = .loading(station: station)
+                    self.notifyStateChange()
                 case .playing:
                     self.state = .playing(station: station)
                     self.nowPlayingService.updateNowPlaying(station: station, isPlaying: true)
+                    self.notifyStateChange()
                 case .paused:
                     // Only update if we're not already in idle or error state
                     if case .loading = self.state {
@@ -325,6 +355,7 @@ final class AudioPlayerService: ObservableObject {
                 let newDuration = Self.initialBufferDuration + Self.stallBufferIncrement * TimeInterval(self.stallCount)
                 self.currentBufferDuration = min(newDuration, Self.maxBufferDuration)
                 item.preferredForwardBufferDuration = self.currentBufferDuration
+                self.notifyStateChange()
             }
         }
 
@@ -332,6 +363,7 @@ final class AudioPlayerService: ObservableObject {
             Task { @MainActor [weak self] in
                 guard let self, item.isPlaybackLikelyToKeepUp else { return }
                 self.isBuffering = false
+                self.notifyStateChange()
             }
         }
     }
@@ -350,6 +382,7 @@ final class AudioPlayerService: ObservableObject {
                 }
             }
         }
+        // notifyStateChange() called by parseStreamTitle() below
     }
 
     func parseStreamTitle(_ rawTitle: String) {
@@ -381,10 +414,12 @@ final class AudioPlayerService: ObservableObject {
                 }
             }
         }
+        notifyStateChange()
     }
 
     func clearTrackHistory() {
         trackHistory = []
+        notifyStateChange()
     }
 
     private func observePlayerItemStatus(item: AVPlayerItem, station: StationDTO) {
@@ -396,6 +431,7 @@ final class AudioPlayerService: ObservableObject {
                     let message = item.error?.localizedDescription ?? "Playback failed"
                     self.state = .error(station: station, message: message)
                     self.nowPlayingService.updateNowPlaying(station: station, isPlaying: false)
+                    self.notifyStateChange()
                 case .readyToPlay:
                     break // timeControlStatus handles the transition to playing
                 case .unknown:

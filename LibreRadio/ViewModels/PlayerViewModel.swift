@@ -27,43 +27,13 @@ final class PlayerViewModel: ObservableObject {
         self.favoritesService = favoritesService
 
         // Forward audioService state changes to trigger objectWillChange.
-        // Polls on a short interval since ObservableObject.objectWillChange is Combine-based
-        // and we avoid Combine per project conventions. The 0.1s interval keeps UI responsive
-        // while avoiding Combine imports entirely.
+        // Uses AudioPlayerService.stateChanges AsyncStream — event-driven, zero-latency,
+        // no Combine. Replaces the previous 100ms polling approach.
         observationTask = Task { [weak self] in
-            var lastState: AudioPlayerService.PlaybackState?
-            var lastTrackTitle: String?
-            var lastArtist: String?
-            var lastIsBuffering: Bool?
-            var lastVolume: Float?
-            var lastTrackHistoryCount: Int?
-
-            while !Task.isCancelled {
-                guard let self else { return }
-                let currentState = self.audioService.state
-                let currentTitle = self.audioService.currentTrackTitle
-                let currentArtist = self.audioService.currentArtist
-                let currentBuffering = self.audioService.isBuffering
-                let currentVolume = self.audioService.volume
-                let currentHistoryCount = self.audioService.trackHistory.count
-
-                if currentState != lastState
-                    || currentTitle != lastTrackTitle
-                    || currentArtist != lastArtist
-                    || currentBuffering != lastIsBuffering
-                    || currentVolume != lastVolume
-                    || currentHistoryCount != lastTrackHistoryCount
-                {
-                    self.objectWillChange.send()
-                    lastState = currentState
-                    lastTrackTitle = currentTitle
-                    lastArtist = currentArtist
-                    lastIsBuffering = currentBuffering
-                    lastVolume = currentVolume
-                    lastTrackHistoryCount = currentHistoryCount
-                }
-
-                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1s
+            guard let audioService = self?.audioService else { return }
+            for await _ in audioService.stateChanges {
+                guard !Task.isCancelled else { break }
+                self?.objectWillChange.send()
             }
         }
     }

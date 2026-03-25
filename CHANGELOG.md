@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-03-25 — Optimize caching for instantaneous app startup
+
+**Prompt:** `/implement cache stations and favicons so the app start is instantaneous`
+
+**Changes:**
+- Added batch `loadHomeData(localCountryCode:)` method to `StationCacheService` with `HomeCacheData` struct — reads all 5 home cache keys in a single actor hop instead of 5 sequential hops
+- Restructured `HomeViewModel.load()` to clear `isLoading` immediately after cached data is assigned, eliminating the loading spinner flash on warm-cache launches
+- Added `preWarmMemoryCache(for:)` to `ImageCacheService` — promotes disk-cached favicons to NSCache for up to 60 URLs on startup, eliminating the placeholder-to-image flash
+- HomeViewModel now launches favicon pre-warming as a non-blocking background Task after cache load
+- Added 9 new tests: `loadHomeData` batch loading (4 tests), `preWarmMemoryCache` behavior (4 tests), cache-first loading state (1 test) — all 432 tests pass
+
+## 2026-03-24 — Implement 5 code quality improvements from technical review
+
+**Prompt:** `/implement P2-6 (StationConvertible), P2-8 (AsyncContentView), P3-2 (AlphabetIndexView accessibility), P3-7 (Test coverage), PlayerViewModel polling replacement`
+
+**Changes:**
+- Added `StationConvertible` protocol with default `toStationDTO()` — eliminates duplicate 25-field initializer boilerplate in `FavoriteStation` and `HistoryEntry`
+- Added `AsyncContentView` generic wrapper — consolidates loading → error → empty → content state pattern across 3 views (`StationListView`, `FavoritesView`, `RecentStationsView`); HomeView kept inline as it has no true empty state
+- Added VoiceOver accessibility to `AlphabetIndexView` — each letter has `accessibilityLabel`, `.isButton` trait, hint, and `onTapGesture` for activation; extracted `letterIndex(forY:letterCount:)` as static for testability
+- Replaced PlayerViewModel 100ms polling `Task` with event-driven `AsyncStream<Void>` observation of `AudioPlayerService.stateChanges` — zero-latency, no wasted cycles
+- Added `stateChanges` AsyncStream + `notifyStateChange()` to `AudioPlayerService` with calls at all state mutation points
+- Added 3 new test files: `StationConvertibleTests` (5 tests), `StringTagListTests` (9 tests), `AlphabetIndexViewTests` (9 tests) — 23 new tests total, all 423 pass
+
 ## 2026-03-23 — Technical review: fix convention violations and code quality issues
 
 **Prompt:** `/implement perform a general technical review of code and architecture and recommendations of things to improve`

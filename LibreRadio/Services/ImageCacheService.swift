@@ -69,6 +69,18 @@ actor ImageCacheService {
         return memoryCache.object(forKey: key as NSString)
     }
 
+    func preWarmMemoryCache(for urls: [URL]) {
+        for url in urls.prefix(60) {
+            let key = cacheKey(for: url)
+            if memoryCache.object(forKey: key as NSString) != nil { continue }
+            let diskPath = diskURL(for: key)
+            if let data = try? Data(contentsOf: diskPath),
+               let image = UIImage(data: data) {
+                memoryCache.setObject(image, forKey: key as NSString)
+            }
+        }
+    }
+
     // MARK: - Private
 
     nonisolated private func cacheKey(for url: URL) -> String {

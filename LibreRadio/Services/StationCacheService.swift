@@ -26,6 +26,31 @@ actor StationCacheService {
         "homeLocal.\(countryCode)"
     }
 
+    // MARK: - Batch Loading
+
+    struct HomeCacheData: Sendable {
+        let local: [StationDTO]?
+        let topClicks: [StationDTO]?
+        let topVotes: [StationDTO]?
+        let recentlyChanged: [StationDTO]?
+        let currentlyPlaying: [StationDTO]?
+
+        var hasData: Bool {
+            local != nil || topClicks != nil || topVotes != nil
+                || recentlyChanged != nil || currentlyPlaying != nil
+        }
+    }
+
+    func loadHomeData(localCountryCode: String) -> HomeCacheData {
+        HomeCacheData(
+            local: load(key: Self.localKey(countryCode: localCountryCode)),
+            topClicks: load(key: Self.homeTopClicks),
+            topVotes: load(key: Self.homeTopVotes),
+            recentlyChanged: load(key: Self.homeRecentlyChanged),
+            currentlyPlaying: load(key: Self.homeCurrentlyPlaying)
+        )
+    }
+
     // MARK: - Public API
 
     func load<T: Decodable>(key: String) -> T? {

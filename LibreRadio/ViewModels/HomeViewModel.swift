@@ -16,17 +16,20 @@ final class HomeViewModel: ObservableObject {
     private let cache: StationCacheService
     private let favoritesService: FavoritesService
     private let historyService: HistoryService
+    private let imageCache: ImageCacheService
 
     init(
         service: RadioBrowserService = .shared,
         cache: StationCacheService = .shared,
         favoritesService: FavoritesService = .shared,
-        historyService: HistoryService = .shared
+        historyService: HistoryService = .shared,
+        imageCache: ImageCacheService = .shared
     ) {
         self.service = service
         self.cache = cache
         self.favoritesService = favoritesService
         self.historyService = historyService
+        self.imageCache = imageCache
     }
 
     func load() async {
@@ -40,22 +43,22 @@ final class HomeViewModel: ObservableObject {
         let localCountry = Locale.current.region?.identifier ?? "US"
         let localCacheKey = StationCacheService.localKey(countryCode: localCountry)
 
-        // Load from cache first
-        let cachedLocal: [StationDTO]? = await cache.load(key: localCacheKey)
-        let cachedClicks: [StationDTO]? = await cache.load(key: StationCacheService.homeTopClicks)
-        let cachedVotes: [StationDTO]? = await cache.load(key: StationCacheService.homeTopVotes)
-        let cachedChanged: [StationDTO]? = await cache.load(key: StationCacheService.homeRecentlyChanged)
-        let cachedPlaying: [StationDTO]? = await cache.load(key: StationCacheService.homeCurrentlyPlaying)
+        // Load all cached home data in a single actor hop
+        let cached = await cache.loadHomeData(localCountryCode: localCountry)
 
-        let hasCache = cachedLocal != nil || cachedClicks != nil || cachedVotes != nil
-            || cachedChanged != nil || cachedPlaying != nil
+        if cached.hasData {
+            localStations = cached.local ?? []
+            topByClicks = cached.topClicks ?? []
+            topByVotes = cached.topVotes ?? []
+            recentlyChanged = cached.recentlyChanged ?? []
+            currentlyPlaying = cached.currentlyPlaying ?? []
+            isLoading = false
 
-        if hasCache {
-            localStations = cachedLocal ?? []
-            topByClicks = cachedClicks ?? []
-            topByVotes = cachedVotes ?? []
-            recentlyChanged = cachedChanged ?? []
-            currentlyPlaying = cachedPlaying ?? []
+            // Pre-warm favicon memory cache from disk for visible stations
+            let imageCache = self.imageCache
+            let faviconURLs = (favoriteStations + recentStations + localStations
+                + topByClicks + topByVotes).compactMap(\.faviconURL)
+            Task { await imageCache.preWarmMemoryCache(for: Array(Set(faviconURLs))) }
         }
 
         // Always fetch fresh data
@@ -79,9 +82,9 @@ final class HomeViewModel: ObservableObject {
             await cache.save(key: StationCacheService.homeRecentlyChanged, value: recentlyChanged)
             await cache.save(key: StationCacheService.homeCurrentlyPlaying, value: currentlyPlaying)
         } catch let appError as AppError {
-            if !hasCache { error = appError }
+            if !cached.hasData { error = appError }
         } catch let urlError as URLError {
-            if !hasCache {
+            if !cached.hasData {
                 switch urlError.code {
                 case .notConnectedToInternet, .networkConnectionLost, .dataNotAllowed:
                     self.error = .networkUnavailable
@@ -92,7 +95,7 @@ final class HomeViewModel: ObservableObject {
                 }
             }
         } catch {
-            if !hasCache { self.error = .serverError(statusCode: 0) }
+            if !cached.hasData { self.error = .serverError(statusCode: 0) }
         }
 
         isLoading = false
