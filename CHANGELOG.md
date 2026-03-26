@@ -1,30 +1,16 @@
 # Changelog
 
-## 2026-03-25 — Now Playing widget with App Group data sharing
-
-**Prompt:** `/implement Now Playing widget with App Group data sharing`
+## 2026-03-26 — Remove widget extension and Live Activity
 
 **Changes:**
-- Replaced static "Quick Launch" widget with dynamic "Now Playing" widget that displays the currently playing station
-- Created `Shared/NowPlayingWidgetData.swift` — Codable + Equatable struct shared between app and widget extension via App Group UserDefaults
-- Created `LibreRadio/Services/WidgetDataService.swift` — `@MainActor` service that writes playback state to shared UserDefaults, deduplicates writes, fetches/resizes favicons (80×80 JPEG), and triggers widget timeline reloads
-- Created App Group entitlements (`group.org.libreradio.app`) for both app and widget extension targets
-- Rewrote `LibreRadioActivity/RadioWidget.swift` — `NowPlayingTimelineProvider` reads shared data; small widget shows favicon + station name + state icon; medium adds metadata row (flag, location, codec, bitrate); idle state shows branded "Tap to listen" layout
-- Integrated `WidgetDataService` into `AudioPlayerService` at all state-change points (play, pause, stop, buffering, time control status, failure)
-- Added stale widget data cleanup on app launch when player is idle
-- Added 10 new tests: `WidgetDataServiceTests` (6 tests) and `NowPlayingWidgetDataTests` (4 tests) — all 442 tests pass
-- Updated SPEC.md and PLAN.md with widget documentation and implementation notes
-
-## 2026-03-25 — Add Home Screen widget for App Store Review compliance
-
-**Prompt:** `/implement add a simple Home Screen widget — This satisfies Apple's review since they can find a widget in the gallery`
-
-**Changes:**
-- Created `RadioWidget.swift` — static branded Home Screen widget (small + medium sizes) with `StaticConfiguration` and `.never` refresh policy, showing app icon and name
-- Created `RadioWidgetBundle.swift` — `@main` `WidgetBundle` entry point containing both `RadioWidget` and `RadioLiveActivityWidget`
-- Removed `@main` and `@available(iOS 16.2, *)` from `RadioLiveActivityWidget` (entry point moved to bundle; availability ensured by explicit deployment target)
-- Added explicit `IPHONEOS_DEPLOYMENT_TARGET: "16.2"` to widget extension build settings in `project.yml` to fix XcodeGen not propagating the per-target deployment target
-- Updated SPEC.md and PLAN.md with widget documentation and implementation notes
+- Removed entire `LibreRadioActivity/` widget extension target (Live Activity + Home Screen widget)
+- Removed `Shared/` directory (RadioPlaybackAction, intents, NowPlayingWidgetData)
+- Removed `LiveActivityService`, `WidgetDataService`, `RadioActivityAttributes`, App Group entitlements
+- Removed all widget/Live Activity wiring from `AudioPlayerService` and `LibreRadioApp`
+- Removed widget/Live Activity test files (WidgetDataServiceTests, NowPlayingWidgetDataTests)
+- Lock screen playback controls continue to work via `NowPlayingService` (MPNowPlayingInfoCenter)
+- Eliminates Apple Review Guideline 2.1 issue — no more `widgetkit-extension` bundle
+- All 418 tests pass
 
 ## 2026-03-25 — Optimize caching for instantaneous app startup
 

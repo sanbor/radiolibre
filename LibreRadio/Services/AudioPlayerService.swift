@@ -93,8 +93,6 @@ final class AudioPlayerService: ObservableObject {
     private var metadataObservation: NSKeyValueObservation?
     private let service: RadioBrowserService
     private let nowPlayingService: NowPlayingService
-    private let widgetDataService: WidgetDataService
-    private let liveActivityService: LiveActivityService
     private var currentBufferDuration: TimeInterval = initialBufferDuration
     private var stallCount: Int = 0
     private let routeDetector = AVRouteDetector()
@@ -105,9 +103,7 @@ final class AudioPlayerService: ObservableObject {
     init(
         player: AVPlayer = AVPlayer(),
         service: RadioBrowserService = .shared,
-        nowPlayingService: NowPlayingService? = nil,
-        widgetDataService: WidgetDataService? = nil,
-        liveActivityService: LiveActivityService? = nil
+        nowPlayingService: NowPlayingService? = nil
     ) {
         let (stream, continuation) = AsyncStream<Void>.makeStream()
         self.stateChanges = stream
@@ -115,8 +111,6 @@ final class AudioPlayerService: ObservableObject {
         self.player = player
         self.service = service
         self.nowPlayingService = nowPlayingService ?? NowPlayingService.shared
-        self.widgetDataService = widgetDataService ?? WidgetDataService.shared
-        self.liveActivityService = liveActivityService ?? LiveActivityService.shared
         player.volume = volume
         setupAudioSession()
         setupInterruptionObserver()
@@ -181,8 +175,6 @@ final class AudioPlayerService: ObservableObject {
         player.play()
 
         nowPlayingService.updateNowPlaying(station: station, isPlaying: true)
-        widgetDataService.update(station: station, isPlaying: true, isLoading: true, isBuffering: false)
-        liveActivityService.startOrUpdate(station: station, isPlaying: true, isLoading: true, isBuffering: false)
         notifyStateChange()
 
         // Fire-and-forget click tracking
@@ -196,8 +188,6 @@ final class AudioPlayerService: ObservableObject {
         player.pause()
         state = .paused(station: station)
         nowPlayingService.updateNowPlaying(station: station, isPlaying: false)
-        widgetDataService.update(station: station, isPlaying: false, isLoading: false, isBuffering: false)
-        liveActivityService.startOrUpdate(station: station, isPlaying: false, isLoading: false, isBuffering: false)
         notifyStateChange()
     }
 
@@ -225,8 +215,6 @@ final class AudioPlayerService: ObservableObject {
         currentArtist = nil
         state = .idle
         nowPlayingService.stopNowPlaying()
-        widgetDataService.clear()
-        liveActivityService.end()
         notifyStateChange()
     }
 
@@ -337,14 +325,10 @@ final class AudioPlayerService: ObservableObject {
                 switch player.timeControlStatus {
                 case .waitingToPlayAtSpecifiedRate:
                     self.state = .loading(station: station)
-                    self.widgetDataService.update(station: station, isPlaying: false, isLoading: true, isBuffering: false)
-                    self.liveActivityService.startOrUpdate(station: station, isPlaying: false, isLoading: true, isBuffering: false)
                     self.notifyStateChange()
                 case .playing:
                     self.state = .playing(station: station)
                     self.nowPlayingService.updateNowPlaying(station: station, isPlaying: true)
-                    self.widgetDataService.update(station: station, isPlaying: true, isLoading: false, isBuffering: self.isBuffering)
-                    self.liveActivityService.startOrUpdate(station: station, isPlaying: true, isLoading: false, isBuffering: self.isBuffering)
                     self.notifyStateChange()
                 case .paused:
                     // Only update if we're not already in idle or error state
@@ -371,10 +355,6 @@ final class AudioPlayerService: ObservableObject {
                 let newDuration = Self.initialBufferDuration + Self.stallBufferIncrement * TimeInterval(self.stallCount)
                 self.currentBufferDuration = min(newDuration, Self.maxBufferDuration)
                 item.preferredForwardBufferDuration = self.currentBufferDuration
-                if let station = self.currentStation {
-                    self.widgetDataService.update(station: station, isPlaying: self.isPlaying, isLoading: false, isBuffering: true)
-                    self.liveActivityService.startOrUpdate(station: station, isPlaying: self.isPlaying, isLoading: false, isBuffering: true)
-                }
                 self.notifyStateChange()
             }
         }
@@ -383,10 +363,6 @@ final class AudioPlayerService: ObservableObject {
             Task { @MainActor [weak self] in
                 guard let self, item.isPlaybackLikelyToKeepUp else { return }
                 self.isBuffering = false
-                if let station = self.currentStation {
-                    self.widgetDataService.update(station: station, isPlaying: self.isPlaying, isLoading: false, isBuffering: false)
-                    self.liveActivityService.startOrUpdate(station: station, isPlaying: self.isPlaying, isLoading: false, isBuffering: false)
-                }
                 self.notifyStateChange()
             }
         }
@@ -455,8 +431,6 @@ final class AudioPlayerService: ObservableObject {
                     let message = item.error?.localizedDescription ?? "Playback failed"
                     self.state = .error(station: station, message: message)
                     self.nowPlayingService.updateNowPlaying(station: station, isPlaying: false)
-                    self.widgetDataService.clear()
-                    self.liveActivityService.end()
                     self.notifyStateChange()
                 case .readyToPlay:
                     break // timeControlStatus handles the transition to playing

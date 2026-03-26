@@ -31,7 +31,7 @@
 | Full-text search | Search with filters | `/json/stations/search` with name, tag, country, language, codec, bitrate filters |
 | Stream playback | ExoPlayer/MediaPlayer | `AVPlayer` with HLS + progressive streams |
 | Background audio | Foreground service | `AVAudioSession.playback` + `UIBackgroundModes: audio` |
-| Lock screen controls | MediaSession + notification | Live Activity (iOS 16.2+) with `LiveActivityIntent` buttons (iOS 17+) + `MPRemoteCommandCenter` |
+| Lock screen controls | MediaSession + notification | `MPNowPlayingInfoCenter` + `MPRemoteCommandCenter` |
 | Now playing metadata | ICY metadata extraction | AVPlayer metadata observation |
 | Favorites | SharedPreferences JSON | SwiftData `FavoriteStation` model |
 | Favorites reordering | Drag-and-drop | SwiftUI `List` with `.onMove` |
@@ -58,8 +58,7 @@
 | Equalizer | System equalizer intent | N/A (iOS has no system EQ API) |
 | Server statistics | Stats view | `/json/stats` |
 | ~~CarPlay~~ | ~~Android Auto MediaBrowserService~~ | ~~`CPTemplate` integration~~ — **Done (Phase 8)** |
-| ~~Live Activity~~ | ~~N/A~~ | ~~ActivityKit lock screen banner + Dynamic Island~~ — **Done (Phase 9)** |
-| Widgets | N/A | WidgetKit for now-playing + favorites |
+| ~~Live Activity~~ | ~~N/A~~ | ~~Removed — duplicated MPNowPlayingInfoCenter~~ |
 | Siri Shortcuts | N/A | `AppIntent` for "Play [station name]" |
 | Metered connection warning | Dialog before playback on mobile | `NWPathMonitor` check for `.constrained` |
 | Fallback stations | Bundled JSON resource | `fallback_stations.json` in app bundle |
@@ -264,13 +263,9 @@ One vote per IP per station per 10 minutes. Returns:
 ```
 LibreRadio/
 ├── LibreRadio.xcodeproj/
-├── Shared/                                      # Compiled into both LibreRadio and LibreRadioActivity targets
-│   ├── RadioPlaybackAction.swift                # Closure-based dispatch for cross-target playback control
-│   ├── TogglePlaybackIntent.swift               # LiveActivityIntent: toggle play/pause (iOS 17+)
-│   └── StopPlaybackIntent.swift                 # LiveActivityIntent: stop playback (iOS 17+)
 ├── LibreRadio/
 │   ├── App/
-│   │   ├── LibreRadioApp.swift                 # @main, SwiftData container, environment setup, RadioPlaybackAction wiring
+│   │   ├── LibreRadioApp.swift                 # @main, SwiftData container, environment setup
 │   │   └── Info.plist                          # Background modes, ATS exceptions, CarPlay scene
 │   │
 │   ├── CarPlay/
@@ -284,7 +279,6 @@ LibreRadio/
 │   │   ├── ClickResponse.swift                 # Codable: /json/url response
 │   │   ├── VoteResponse.swift                  # Codable: /json/vote response
 │   │   ├── ServerStats.swift                   # Codable: /json/stats response
-│   │   ├── RadioActivityAttributes.swift       # ActivityKit attributes + ContentState (shared with widget extension)
 │   │   ├── FavoriteStation.swift               # SwiftData @Model
 │   │   ├── HistoryEntry.swift                  # Codable struct, UserDefaults persistence
 │   │   └── AppError.swift                      # Typed error enum
@@ -294,7 +288,6 @@ LibreRadio/
 │   │   ├── RadioBrowserService.swift            # All API calls (actor)
 │   │   ├── AudioPlayerService.swift             # AVPlayer wrapper, playback state machine
 │   │   ├── NowPlayingService.swift              # MPNowPlayingInfoCenter + MPRemoteCommandCenter
-│   │   ├── LiveActivityService.swift            # ActivityKit Live Activity lifecycle management
 │   │   ├── HistoryService.swift                 # Actor: play history persistence + dedup + limit
 │   │   └── ImageCacheService.swift              # NSCache + disk cache for favicons
 │   │
@@ -358,13 +351,6 @@ LibreRadio/
 │       │   ├── AccentColor.colorset/
 │       │   └── Colors/
 │       └── Localizable.xcstrings                # All user-facing strings
-│
-├── LibreRadioActivity/                          # Widget extension (iOS 16.2+)
-│   ├── Info.plist
-│   ├── LibreRadioActivity.entitlements          # App Group entitlement (group.org.libreradio.app)
-│   ├── RadioWidgetBundle.swift                  # @main WidgetBundle containing all widgets
-│   ├── RadioWidget.swift                        # Now Playing widget (small + medium), reads from shared UserDefaults
-│   └── RadioLiveActivityWidget.swift            # Lock screen banner + Dynamic Island + playback controls
 │
 └── LibreRadioTests/
     ├── Services/
@@ -697,41 +683,6 @@ final class NowPlayingService {
 
     // handleLikeCommand() falls back to audioService.lastPlayedStation when currentStation
     // is nil (after stop), so the like/star button works on the lock screen even when stopped.
-}
-```
-
-#### `LiveActivityService.swift`
-
-```swift
-@MainActor
-final class LiveActivityService {
-    static let shared = LiveActivityService()
-
-    private var currentFaviconData: Data?   // 80×80 JPEG thumbnail
-    private var currentStationId: String?   // detect station changes
-    private var lastStation: StationDTO?    // for deferred re-updates
-    private var lastIsPlaying, lastIsLoading, lastIsBuffering: Bool
-
-    func startOrUpdate(station: StationDTO, isPlaying: Bool, isLoading: Bool, isBuffering: Bool)
-    // Creates or updates a Live Activity with RadioActivityAttributes.ContentState.
-    // On new station: clears favicon, starts async fetch via ImageCacheService,
-    // resizes to 80×80 JPEG, stores result, re-updates activity.
-    // On app restart, recovers existing activities from Activity<RadioActivityAttributes>.activities
-    // before creating new ones (prevents duplicates).
-
-    func end()
-    // Ends the current activity with .immediate dismissal policy.
-    // Clears all cached state (favicon, station ID, last state).
-
-    func endOrphanedActivities()
-    // Ends all RadioActivityAttributes activities with .immediate dismissal.
-    // Called on app launch to clean up stale activities from previous sessions.
-
-    private func fetchFavicon(for station: StationDTO)
-    // Fetches via ImageCacheService, resizes to 80×80 JPEG, re-updates if still same station.
-
-    private func performUpdate()
-    // Shared helper: builds ContentState (including faviconData) and updates/creates activity.
 }
 ```
 
@@ -1113,11 +1064,7 @@ struct LibreRadioApp: App {
                 .environmentObject(favoritesVM)
                 .modelContainer(for: [FavoriteStation.self, HistoryEntry.self])
                 .task {
-                    // Wire Live Activity intent closures to AudioPlayerService
-                    RadioPlaybackAction.togglePlayPause = { AudioPlayerService.shared.togglePlayPause() }
-                    RadioPlaybackAction.stop = { AudioPlayerService.shared.stop() }
                     // ...
-                    LiveActivityService.shared.endOrphanedActivities()
                     await ServerDiscoveryService.shared.resolveIfNeeded()
                 }
         }
@@ -1160,12 +1107,9 @@ struct LibreRadioApp: App {
 - AVPlayer continues automatically in background once session is configured
 
 ### Lock Screen & Control Center
-- **Live Activity** (iOS 16.2+) provides the enhanced lock screen experience; `nowPlayingInfo` is also set for CarPlay and Control Center
+- `NowPlayingService` sets `MPNowPlayingInfoCenter.nowPlayingInfo` for lock screen, CarPlay, and Control Center
 - `MPRemoteCommandCenter` handlers registered once at app start
 - Commands: `playCommand`, `pauseCommand`, `stopCommand`, `togglePlayPauseCommand`, `nextTrackCommand`, `previousTrackCommand`
-- Live Activity playback controls (iOS 17+): `TogglePlaybackIntent` and `StopPlaybackIntent` (`LiveActivityIntent` conformers in `Shared/`) call `RadioPlaybackAction` closures wired at launch
-- `RadioActivityAttributes.ContentState` carries: station name, codec, bitrate, flag emoji, country location label (country code + subdivision via `locationLabel`), playback state flags, favicon image data (optional, 80×80 JPEG thumbnail)
-- Activities ended with `.immediate` dismissal to prevent stale banners; orphaned activities cleaned up on launch
 
 ### AirPlay
 - `AVRoutePickerView` (UIKit, wrapped in UIViewRepresentable) provides native AirPlay button
@@ -1390,62 +1334,6 @@ struct LibreRadioApp: App {
 
 **Verify:** `xcodegen generate` succeeds, `xcodebuild build` succeeds, all existing tests pass, CarPlay Simulator shows tabs with station lists.
 
-### Phase 9: Live Activity
-**Goal:** Single, clean lock screen element with interactive controls. Replaces overlapping Now Playing widget.
-
-1. `NowPlayingService.updateNowPlaying()` sets `nowPlayingInfo` (station name, metadata, artwork) for CarPlay and Control Center alongside the Live Activity
-2. Fix duplicate Live Activities: `.immediate` dismissal policy, recover existing activities on app restart
-3. Fix play after stop: `lastPlayedStation` property in `AudioPlayerService`, `resume()` and `togglePlayPause()` fall back to it
-4. Add `countryLocation` to `RadioActivityAttributes.ContentState`, display in lock screen banner and Dynamic Island
-5. Add `LiveActivityIntent` playback controls (iOS 17+): `TogglePlaybackIntent`, `StopPlaybackIntent` in `Shared/` directory, `RadioPlaybackAction` closure-based dispatch, `Button(intent:)` in widget
-6. Update `project.yml` to include `Shared/` in both app and widget extension targets
-7. Wire `RadioPlaybackAction` closures in `LibreRadioApp.swift`
-8. Update all tests: `NowPlayingServiceTests` (verify `nowPlayingInfo` is set), `RadioActivityAttributesTests` + `LiveActivityServiceTests` (add `countryLocation`), `AudioPlayerServiceTests` (test `lastPlayedStation`, resume after stop, toggle from idle)
-9. Add `faviconData: Data?` to `ContentState` — favicon fetched/resized (80×80 JPEG) by `LiveActivityService` via `ImageCacheService`, passed as bytes through activity updates. Widget decodes `Data` → `UIImage` → `Image`. Lock screen shows 40×40 rounded-rect favicon; Dynamic Island expanded leading shows 24×24 favicon. Placeholder `radio` SF Symbol when nil. `TogglePlaybackIntent` carries forward `faviconData` in optimistic state.
-
-**Implementation notes (Phase 9):**
-- **`Shared/` directory pattern:** Intent types and `RadioPlaybackAction` must be compiled in both the main app and widget extension. `LiveActivityIntent.perform()` runs in the main app process, not the widget extension, so closures are set in the app and called by the intent.
-- **iOS 16.2 fallback:** `Button(intent:)` requires iOS 17. On iOS 16.2, the widget falls back to static state icons (waveform/pause/ellipsis).
-- **CarPlay integration:** `CPNowPlayingTemplate` reads from `nowPlayingInfo`, which is populated by `NowPlayingService` — CarPlay Now Playing tab shows station metadata correctly.
-- **Favicon in widget:** Widget extensions cannot make network requests. `LiveActivityService` tracks `currentStationId` and `currentFaviconData` — on station change, clears cached data, fetches via `ImageCacheService`, resizes to 80×80 JPEG, stores result, and calls `performUpdate()` to re-update the activity. State tracking fields (`lastStation`, `lastIsPlaying`, etc.) enable the deferred re-update after async fetch completes.
-
-**Verify:** `xcodegen generate` succeeds, `xcodebuild build` succeeds, all 326 tests pass. Manual: only Live Activity on lock screen, no duplicates, play resumes after stop, country location displays correctly, buttons work on iOS 17+, favicon appears in lock screen and Dynamic Island.
-
-### Post-Phase: Home Screen Widget (Quick Launch)
-**Goal:** Add a visible Home Screen widget to the existing widget extension, satisfying Apple App Store Review Guideline 2.1 (reviewers could see the `com.apple.widgetkit-extension` bundle but couldn't find a widget in the gallery since only Live Activities were implemented).
-
-1. `RadioWidget.swift` — static branded widget (small + medium) with `StaticConfiguration` and `.never` refresh policy
-2. `RadioWidgetBundle.swift` — `@main` `WidgetBundle` containing `RadioWidget` + `RadioLiveActivityWidget`
-3. Remove `@main` from `RadioLiveActivityWidget` (moved to bundle)
-4. Fix deployment target: add explicit `IPHONEOS_DEPLOYMENT_TARGET: "16.2"` to extension build settings in `project.yml` and remove redundant `@available(iOS 16.2, *)` from `RadioLiveActivityWidget`
-
-**Implementation notes (Home Screen Widget):**
-- **`@available` vs deployment target:** XcodeGen's `deploymentTarget` key wasn't reliably setting `IPHONEOS_DEPLOYMENT_TARGET` in the build settings — the base project setting of 16.0 leaked through. Adding the explicit build setting fixed it and allowed removing the `@available(iOS 16.2, *)` annotation from `RadioLiveActivityWidget`.
-- **`WidgetBundleBuilder` limitations:** The `@WidgetBundleBuilder` result builder does NOT support `if #available` checks (`buildLimitedAvailability` is not implemented). You cannot conditionally include widgets based on OS version inside a `WidgetBundle.body`. All widgets must be unconditionally available at the extension's deployment target.
-- **`containerBackground` for iOS 17+:** iOS 17 requires widgets to use `.containerBackground(for: .widget)` for background rendering. Use `iOSApplicationExtension` (not `iOS`) in `#available` checks inside extension targets.
-- **No tests needed:** The widget is purely declarative SwiftUI with a trivial static timeline provider. No business logic to unit test.
-
-**Verify:** `xcodegen generate` succeeds, `xcodebuild build` succeeds, all 432 tests pass. Manual: widget appears in the Home Screen widget gallery under "LibreRadio" in both small and medium sizes.
-
-### Post-Phase: Now Playing Widget with App Group Data Sharing
-**Goal:** Replace the static Quick Launch widget with a dynamic Now Playing widget that shows the currently playing station, using App Group shared UserDefaults for data transport.
-
-1. `Shared/NowPlayingWidgetData.swift` — Codable + Equatable struct shared between app and extension
-2. `LibreRadio/App/LibreRadio.entitlements` + `LibreRadioActivity/LibreRadioActivity.entitlements` — App Group (`group.org.libreradio.app`)
-3. `LibreRadio/Services/WidgetDataService.swift` — `@MainActor final class` that writes `NowPlayingWidgetData` to shared UserDefaults and calls `WidgetCenter.shared.reloadTimelines()`
-4. Wire `WidgetDataService` into `AudioPlayerService` via init injection (same pattern as `nowPlayingService`)
-5. Rewrite `RadioWidget.swift` — `NowPlayingTimelineProvider` reads from shared UserDefaults, `NowPlayingWidgetView` shows station info or idle state
-6. Clear stale widget data on app launch in `LibreRadioApp.swift`
-
-**Implementation notes (Now Playing Widget):**
-- **App Group in dev builds:** `CODE_SIGNING_ALLOWED: "NO"` prevents actual entitlement enforcement, but `UserDefaults(suiteName:)` works in the Simulator regardless. Entitlements files are referenced via `CODE_SIGN_ENTITLEMENTS` in `project.yml` and will be embedded on App Store builds.
-- **Deduplication is essential:** Playback state changes very frequently (loading→playing→buffering→playing). `WidgetDataService` compares with `lastWrittenData` via Equatable to skip redundant writes and avoid burning WidgetKit's reload budget (~40-70/day).
-- **Favicon mirrors LiveActivityService pattern:** `fetchFavicon(for:)` uses `ImageCacheService.shared.image(for:)` + `UIGraphicsImageRenderer` 80×80 JPEG 0.7 quality. Duplicated from `LiveActivityService` intentionally — the services have different lifecycles and merging them would couple unrelated Apple platform features.
-- **`LiveActivityService.startOrUpdate()` is never called:** Discovered during implementation that Live Activities are defined but not wired up. Out of scope — should be fixed in a follow-up.
-- **Widget replaces Quick Launch:** The Now Playing widget's idle state shows the same branded layout as the old Quick Launch widget, so it still satisfies App Store Review Guideline 2.1.
-
-**Verify:** `xcodegen generate` succeeds, `xcodebuild build` succeeds, all 442 tests pass. Manual: add widget to Home Screen, play station → shows station info, stop → shows idle state.
-
 ### Post-Phase: Apple Music-style Home Redesign
 
 **Goal:** Make the Home section visually closer to Apple Music — larger typography, tighter spacing, bigger station cards, and fluid edge-to-edge layout.
@@ -1472,7 +1360,13 @@ struct LibreRadioApp: App {
 - **Duplicate tag parsing in StationDTO and FavoriteStation** extracted to `String.asTagList` extension (`String+TagList.swift`). Both models now delegate to `tags?.asTagList ?? []`.
 - **HomeViewModel caught all non-AppError exceptions as `.networkUnavailable`.** Now distinguishes `URLError` codes (`.notConnectedToInternet`, `.timedOut`, etc.) for more accurate error messages. Unknown errors map to `.serverError(statusCode: 0)` rather than falsely claiming no internet.
 - **FavoritesService.syncWithServer() race condition was investigated and found safe.** Actor isolation serializes concurrent calls. The `await` suspension point does not allow interleaving within the same actor. No code change needed.
-- **Magic numbers extracted:** `LiveActivityService.staleInterval` (was inline `15 * 60`), `ImageCacheService.memoryCacheLimit` (was inline `200`).
+- **Magic numbers extracted:** `ImageCacheService.memoryCacheLimit` (was inline `200`).
+
+---
+
+## Important: No Live Activity or Widget Extension
+
+**Do NOT add a Live Activity (ActivityKit), widget extension, or WidgetKit integration.** A Live Activity was previously built and removed because it duplicated the standard Now Playing widget on the lock screen — both showed the same station info side by side. It also caused Apple Review Guideline 2.1 rejections. Lock screen controls, CarPlay, and Control Center are fully handled by `NowPlayingService` via `MPNowPlayingInfoCenter` + `MPRemoteCommandCenter`. No widget extension target should exist in this project.
 
 ---
 
@@ -1483,8 +1377,7 @@ These features can be added after the core app is stable:
 1. **Sleep Timer** — countdown timer that stops playback
 2. **Stream Recording** — capture audio to file using `AVAssetWriter`
 3. ~~**Track History**~~ — **Done.** In-memory session-scoped track history with browse controls in full player. Stored on `AudioPlayerService.trackHistory` as `[TrackHistoryItem]` (not persisted). Full player shows left/right chevrons to browse and tap-to-open history sheet. Station name fallback when no ICY metadata.
-4. **Widgets** — Now Playing widget done (dynamic, small + medium, App Group data sharing). Favorites widget still planned
-5. **Siri Shortcuts** — `AppIntent` for "Play [station name]"
+4. **Siri Shortcuts** — `AppIntent` for "Play [station name]"
 6. **Geo Search** — find stations near current location
 7. **M3U Export/Import** — share favorites as playlist files
 8. **iPad Layout** — sidebar navigation with split view

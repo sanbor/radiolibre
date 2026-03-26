@@ -5,7 +5,7 @@ Native iOS internet radio player powered by the [Radio Browser](https://www.radi
 - iOS 16+, SwiftUI, no third-party dependencies
 - License: GPL-3.0
 
-> **Current status:** All MVP phases (1–7) and post-MVP phases 8–9 are complete. The app is fully functional with CarPlay and Live Activity support. Next up: post-MVP feature work (sleep timer, widgets, Siri shortcuts, etc.).
+> **Current status:** All MVP phases (1–7) and post-MVP phase 8 (CarPlay) are complete. The app is fully functional with CarPlay support. Lock screen / Control Center playback is handled by `NowPlayingService` via `MPNowPlayingInfoCenter`. Next up: post-MVP feature work (sleep timer, Siri shortcuts, etc.).
 
 ---
 
@@ -249,7 +249,7 @@ Automatic record of played stations, shown in the **Recent** tab.
 
 | Action | Behavior |
 |---|---|
-| Play station | Buffer stream → start playback → update Live Activity → track click. Records `lastPlayedStation` for resume after stop. |
+| Play station | Buffer stream → start playback → update Now Playing info → track click. Records `lastPlayedStation` for resume after stop. |
 | Pause | Stop streaming (live radio, so pause = stop) |
 | Resume | Reconnect to live stream (equivalent to re-play). Falls back to `lastPlayedStation` when `currentStation` is nil (after stop). |
 | Stop | Return to idle. `lastPlayedStation` is preserved for later resume. Lock screen/Control Center retains station name, artwork, track metadata, and like button (with `playbackRate = 0` so play button is shown). |
@@ -300,32 +300,7 @@ Allows HTTP (non-HTTPS) for media streams only via `NSAllowsArbitraryLoadsForMed
 
 ## Lock Screen & Control Center
 
-### Live Activity (iOS 16.2+)
-
-The Live Activity provides an enhanced lock screen experience. `MPNowPlayingInfoCenter.nowPlayingInfo` is also set by `updateNowPlaying()` with station name, artist metadata (country code + subdivision + codec + bitrate), live stream flag, playback rate, and favicon artwork. Live Activity takes visual priority on the lock screen; `nowPlayingInfo` provides CarPlay Now Playing tab metadata and the standard Control Center widget.
-
-**Lock screen banner** shows:
-- Station favicon (40×40 rounded rect, placeholder `antenna.radiowaves.left.and.right` icon if unavailable)
-- Flag emoji + station name (headline)
-- Country code + subdivision, codec, bitrate (secondary metadata, no flag emoji — emojis render as gray rectangles on the lock screen)
-- Play/pause and stop buttons (iOS 17+ via `LiveActivityIntent`; static state icon on iOS 16.2)
-
-**Dynamic Island** shows:
-- Expanded: station favicon + name (leading), playback controls (trailing), country code + subdivision + codec + bitrate (bottom, no flag emoji)
-- Compact: antenna icon (leading), state icon (trailing)
-- Minimal: antenna icon
-
-**Lifecycle:**
-- Started on play, updated on state changes
-- Ended with `.immediate` dismissal policy on stop (prevents stale banners)
-- On app launch, orphaned activities from previous sessions are ended immediately
-- On app restart, existing activities are recovered from `Activity<RadioActivityAttributes>.activities` before creating new ones (prevents duplicates)
-
-**ContentState:** station name, codec, bitrate label, flag emoji, country location label (country code + subdivision), isPlaying, isLoading, isBuffering, faviconData (optional thumbnail bytes).
-
-**Favicon in widget:** Widget extensions cannot make network requests. `LiveActivityService` fetches the favicon via `ImageCacheService` in the main app, resizes to 80×80 JPEG (~2-4KB), and passes the bytes through `ContentState.faviconData: Data?`. On station change, favicon is fetched asynchronously and the activity is re-updated when ready.
-
-**Playback controls** (iOS 17+): `TogglePlaybackIntent` and `StopPlaybackIntent` conform to `LiveActivityIntent`. They call `RadioPlaybackAction` closures (wired to `AudioPlayerService` at launch), which run in the main app process. Shared source files in `Shared/` are compiled into both the app and widget extension targets.
+`NowPlayingService` sets `MPNowPlayingInfoCenter.nowPlayingInfo` with station name, artist metadata (country code + subdivision + codec + bitrate), live stream flag, playback rate, and favicon artwork. This drives the standard lock screen Now Playing widget, Control Center playback controls, and CarPlay Now Playing tab.
 
 ### Remote Commands
 
@@ -512,8 +487,6 @@ Requires `CPTemplateApplicationSceneSessionRoleApplication` in `UISceneConfigura
 | 6 | Polish | Done |
 | 7 | Testing | Done |
 | 8 | CarPlay (post-MVP) | Done |
-| 9 | Live Activity (post-MVP) | Done |
-
 ### Post-MVP Features (Not Started)
 
 #### Sleep Timer
@@ -527,13 +500,6 @@ Record live radio audio to files on device. Uses `AVAssetWriter` to capture audi
 #### Track History (Song Log)
 
 Log ICY metadata (artist + track title) parsed from streams over time. Persisted via SwiftData as `TrackHistoryEntry` records. Provides a scrollable song log per station showing what was playing and when. Optional integration with MusicBrainz or Last.fm for album art and track metadata enrichment.
-
-#### Widgets
-
-WidgetKit home screen widgets in the existing `LibreRadioActivity` extension (which also hosts Live Activities). Data shared between app and widget extension via App Group (`group.org.libreradio.app`) UserDefaults.
-
-- **Now Playing widget** (implemented) — shows current station name, favicon, playback state indicator, and metadata (flag + location + codec + bitrate) in small and medium sizes. Idle state shows branded "LibreRadio" / "Tap to listen" layout. `WidgetDataService` writes `NowPlayingWidgetData` to shared UserDefaults on every state change and calls `WidgetCenter.shared.reloadTimelines()`. Widget reads via `StaticConfiguration` with `.never` refresh policy (app-driven reloads). Favicon pre-compressed to 80×80 JPEG by the app before writing. Deduplicates writes via Equatable comparison.
-- **Favorites widget** (planned) — shows a grid or list of favorite stations. Tapping a station launches the app and starts playback.
 
 #### Siri Shortcuts
 
